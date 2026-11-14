@@ -1,0 +1,8 @@
+# Model profiles sent to the freellmapi router.
+# "auto" lets the router choose; fast/smart pick its speed or capability chains.
+default = "auto"
+
+[profiles]
+auto = "auto"
+fast = "auto:fast"
+smart = "auto:smart"
