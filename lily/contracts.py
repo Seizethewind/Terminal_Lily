@@ -8,6 +8,8 @@ What `run` takes and returns, per layer:
                                or {"type": "tool_call", "id": str,
                                    "name": str, "args": dict}
   tools.run(state, call=dict)  -> str (the tool's output)
+  tools.schemas()              -> list of OpenAI-style tool definitions
+                                  (optional; the llm layer offers them to the model)
   rag.run(state, query=str)    -> None (appends snippets to state.context)
 """
 from typing import Protocol
