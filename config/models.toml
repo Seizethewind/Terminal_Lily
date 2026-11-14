@@ -6,3 +6,13 @@ default = "auto"
 auto = "auto"
 fast = "auto:fast"
 smart = "auto:smart"
+
+# Used only while the profile is "auto". If your message contains a word that
+# starts with one of these, Lily asks the router for that profile instead.
+# The first matching profile wins, so smart is checked before fast.
+[rules]
+smart = [
+  "code", "coding", "bug", "debug", "function", "script", "refactor",
+  "implement", "algorithm", "plan", "design", "architecture", "strategy",
+]
+fast = ["quick", "briefly", "tl;dr", "one line", "one sentence"]

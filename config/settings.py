@@ -1,7 +1,7 @@
 """Loads .env, models.toml and the system prompt into one Settings object."""
 import os
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from lily.utils.errors import ConfigError
@@ -45,6 +45,8 @@ class Settings:
     system_prompt: str
     max_steps: int = 8
     max_history: int = 40
+    timeout: int = 60
+    rules: dict = field(default_factory=dict)   # profile -> trigger words
     data_dir: Path = DATA_DIR
 
     @classmethod
@@ -64,4 +66,6 @@ class Settings:
             profile=default,
             system_prompt=prompt,
             max_steps=_env_int("LILY_MAX_STEPS", 8),
+            timeout=_env_int("LILY_TIMEOUT", 60),
+            rules=models.get("rules") or {},
         )

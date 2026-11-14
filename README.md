@@ -7,8 +7,8 @@ run by its own sub orchestrator and all coordinated by one main orchestrator:
 - **Tools**: shell, files, web, Termux API, the LilyAi MCP, and your own plugins
 - **RAG**: her notes and documents, searched with SQLite
 
-> Status: building in layers. This first layer is the skeleton, config, UI and
-> main orchestrator. Without the LLM layer she starts, but cannot answer yet.
+> Status: building in layers. Done: skeleton, config, UI, main orchestrator and
+> the LLM layer. Next: Tools, then RAG, then the data layer.
 
 ## Quick start (Termux)
 
@@ -21,6 +21,13 @@ python main.py
 ```
 
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/exit`.
+
+## Choosing a model
+
+Lily sends `auto`, `auto:fast` or `auto:smart` to your router (see
+`config/models.toml`). Set one by hand with `/profile fast`. While the profile
+is `auto`, trigger words in `[rules]` switch a single message to another
+profile (for example "code" or "plan" use `smart`, "quick" uses `fast`).
 
 ## Rules of this repo
 
@@ -47,12 +54,14 @@ you -> ui -> main orchestrator -> agent loop
 main.py            entry point
 config/            settings, models.toml, system_prompt.txt
 lily/              orchestrator, agent_loop, router, state, bootstrap
+lily/llm/          LLM sub orchestrator, prompt builder, parser, profile picker
+lily/llm/providers/  openai_compat.py (standard library only)
 lily/ui/           terminal loop, rich renderer, slash commands
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
 ```
 
-Coming next: `lily/llm/`, `lily/tools/` (+ `plugins/`), `lily/rag/`, `lily/memory/`.
+Coming next: `lily/tools/` (+ `plugins/`), `lily/rag/`, `lily/memory/`.
 
 ## License
 

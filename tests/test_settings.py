@@ -1,6 +1,8 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from config.settings import Settings
 from lily.orchestrator import Lily
@@ -35,6 +37,20 @@ class SettingsTests(unittest.TestCase):
     def test_bad_toml(self):
         with self.assertRaises(ConfigError):
             load_from("this is = = not toml")
+
+    def test_rules_are_loaded(self):
+        settings = load_from(MODELS + '[rules]\nsmart = ["code"]\n')
+        self.assertEqual(settings.rules, {"smart": ["code"]})
+        self.assertEqual(load_from(MODELS).rules, {})
+
+    def test_timeout_from_environment(self):
+        with mock.patch.dict(os.environ, {"LILY_TIMEOUT": "5"}):
+            self.assertEqual(load_from(MODELS).timeout, 5)
+
+    def test_bad_timeout_is_a_config_error(self):
+        with mock.patch.dict(os.environ, {"LILY_TIMEOUT": "soon"}):
+            with self.assertRaises(ConfigError):
+                load_from(MODELS)
 
     def test_profile_switching_on_main_orchestrator(self):
         lily = Lily(load_from(MODELS))
