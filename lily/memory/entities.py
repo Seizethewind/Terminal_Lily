@@ -1,4 +1,4 @@
-"""The entity taxonomy's word list: 3 classes (entity, location, object), each split into subclasses."""
+"""The entity taxonomy's word list: 7 classes (entity, location, object, literature, science, math, history)."""
 import re
 import tomllib
 from collections import Counter
@@ -7,7 +7,7 @@ from lily.utils.errors import ConfigError, LilyError
 from lily.utils.paths import CONFIG_DIR
 
 PATH = CONFIG_DIR / "entities.toml"
-CLASSES = ("entity", "location", "object")
+CLASSES = ("entity", "location", "object", "literature", "science", "math", "history")
 SUB = re.compile(r"^[a-z][a-z -]{0,29}$")
 NAME = re.compile(r"^\w[\w '-]{0,38}\w$")
 
@@ -53,5 +53,5 @@ class Taxonomy:
         lines = []
         for cls in CLASSES:
             subs = sorted(sub for c, sub in counts if c == cls)
-            lines.append(f"{cls:<9} " + (", ".join(f"{sub} ({counts[(cls, sub)]})" for sub in subs) or "-"))
+            lines.append(f"{cls:<11} " + (", ".join(f"{sub} ({counts[(cls, sub)]})" for sub in subs) or "-"))
         return "\n".join(lines)

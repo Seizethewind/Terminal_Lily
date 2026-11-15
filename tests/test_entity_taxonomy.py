@@ -82,6 +82,18 @@ class EntityFlowTests(unittest.TestCase):
         rows = memory.db.rows("SELECT name, cls, sub FROM entity_mentions ORDER BY name")
         self.assertEqual(rows, [("dog", "entity", "animal"), ("japan", "location", "country")])
 
+    def test_subjects_are_filed_next_to_the_things(self):
+        lily, memory = setup(text_reply("Photosynthesis is biology."))
+        lily.handle("explain the quadratic formula in a haiku about the Renaissance")
+        rows = memory.db.rows("SELECT cls, sub, name FROM entity_mentions ORDER BY cls, name")
+        self.assertEqual(rows, [
+            ("history", "era", "renaissance"), ("literature", "form", "haiku"),
+            ("math", "algebra", "quadratic"), ("science", "biology", "biology"),
+            ("science", "biology", "photosynthesis")])
+        report = commands.run(lily, "/entity").splitlines()
+        self.assertEqual([x for x in report if not x.startswith(" ")], ["literature", "science", "math", "history"])
+        self.assertIn("math", commands.run(lily, "/entity classes"))
+
     def test_slash_commands(self):
         lily, _ = setup(text_reply("A cat."))
         lily.handle("what is on my desk? phone?")
