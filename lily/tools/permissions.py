@@ -1,10 +1,5 @@
 """Asks the user before a tool runs (every tool, for now)."""
-import json
-
-
-def _short(args, limit=1000):
-    text = json.dumps(args, ensure_ascii=False)
-    return text if len(text) <= limit else text[:limit] + "..."
+from lily.tools.describe import describe
 
 
 class Permissions:
@@ -12,5 +7,6 @@ class Permissions:
         self.lily = lily   # lily.confirm is set by the UI after startup
 
     def allow(self, tool, args):
-        question = f"Lily wants to run {tool.name} {_short(args)} - allow?"
+        what, details = describe(tool.name, args)
+        question = "\n".join([f"Lily wants to {what}:", *(f"    {line}" for line in details)])
         return bool(self.lily.confirm(question))
