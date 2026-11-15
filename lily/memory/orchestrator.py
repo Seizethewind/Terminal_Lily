@@ -2,6 +2,7 @@
 from lily.memory import export_dataset, feedback, history, lessons, profile_hints, run_log, summarizer
 from lily.memory.code_taxonomy import CodeTaxonomy
 from lily.memory.db import Database
+from lily.memory.entity_taxonomy import EntityTaxonomy
 from lily.utils.errors import LilyError
 
 DB_NAME = "lily.db"
@@ -16,6 +17,7 @@ class MemoryOrchestrator:
         self._db = db
         self.last_run_id = None
         self.code = CodeTaxonomy(lambda: self.db)   # the coding taxonomy
+        self.entities = EntityTaxonomy(lambda: self.db)   # entity / location / object
 
     @property
     def db(self):
@@ -38,10 +40,11 @@ class MemoryOrchestrator:
         record.setdefault("profile", getattr(llm, "last_profile", ""))
         record.setdefault("routed_via", getattr(llm, "last_routed_via", ""))
         self.last_run_id = run_log.record(self.db, record)
-        try:
-            self.code.index_run(self.last_run_id, record.get("user_text", ""), record.get("answer", ""))
-        except LilyError:
-            pass   # the code index is a bonus; the run itself is already saved
+        for taxonomy in (self.code, self.entities):
+            try:
+                taxonomy.index_run(self.last_run_id, record.get("user_text", ""), record.get("answer", ""))
+            except LilyError:
+                pass   # the taxonomies are a bonus; the run itself is already saved
 
     def suggest_profile(self, text):
         try:

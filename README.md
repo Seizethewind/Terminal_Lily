@@ -24,7 +24,7 @@ python main.py
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
 `/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
 `/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
-`/export [all]`, `/stats`, `/code`, `/exit`.
+`/export [all]`, `/stats`, `/code`, `/entity`, `/exit`.
 
 ## Choosing a model
 
@@ -121,6 +121,33 @@ nothing is lost. Add it to the file and run `/code scan` to file it properly.
 - `/code export <language>` writes the chats containing that language to
   `data/code_<language>.jsonl`.
 
+## Entity taxonomy (entity, location, object)
+
+Everything else Lily hears about is sorted into three classes, each with basic
+subclasses:
+
+| Class | Subclasses |
+|---|---|
+| **entity** (living things, groups of people) | person, animal, plant, organization |
+| **location** | country, city, region, water, landform, place |
+| **object** | device, vehicle, tool, food, clothing |
+
+After each answer Lily scans your message and her answer for the words listed in
+`config/entities.toml` and files each one as `class > subclass` (it also finds
+plurals, and ignores code). No API calls. It is a **word list**, so it cannot
+tell meanings apart ("mouse" is always a device) and it only knows the words
+you give it.
+
+- `/entity` shows the tree with counts, `/entity classes` lists the subclasses.
+- `/entity show <class[/sub]>` lists the words filed there, for example
+  `/entity show object/device`.
+- `/entity find <word>` shows the latest chats that mention a word.
+- `/entity add <word> <class/sub>` teaches her a word, for example
+  `/entity add seize entity/person` or `/entity add cebu pines location/place`.
+  Subclasses are free: a new name makes a new subclass. `/entity remove <word>`
+  removes one you added.
+- `/entity scan` re-files all stored chats after you add words or edit the file.
+
 ## Rules of this repo
 
 - Every Python file is **120 lines or fewer** and does **one thing**
@@ -144,7 +171,7 @@ you -> ui -> main orchestrator -> agent loop
 
 ```
 main.py            entry point
-config/            settings, models.toml, mcp_servers.toml, languages.toml, system_prompt.txt
+config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
 scripts/           setup_termux.sh (first install), update.sh (update from GitHub)
 lily/              orchestrator, agent_loop, router, state, bootstrap
@@ -154,7 +181,7 @@ lily/tools/        Tools sub orchestrator, registry, loader, permissions
 lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_search
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
-lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding taxonomy
+lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding and entity taxonomies
 lily/ui/           terminal loop, rich renderer, slash commands
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
