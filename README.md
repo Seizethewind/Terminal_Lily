@@ -8,7 +8,7 @@ run by its own sub orchestrator and all coordinated by one main orchestrator:
 - **RAG**: her notes and documents, searched with SQLite
 
 > Status: building in layers. Done: skeleton, config, UI, main orchestrator,
-> the LLM layer and the Tools layer. Next: RAG, then the data layer.
+> the LLM layer, the Tools layer and RAG. Next: the data layer.
 
 ## Quick start (Termux)
 
@@ -21,7 +21,7 @@ python main.py
 ```
 
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
-`/reload`, `/exit`.
+`/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/exit`.
 
 ## Choosing a model
 
@@ -47,6 +47,17 @@ and never stops Lily.
 `enabled = true`), put the token in `.env` as `LILYAI_MCP_TOKEN`, then
 `/reload`. Its tools appear as `lilyai__<tool>`. Only the Streamable HTTP
 transport is supported.
+
+## Notes (RAG)
+
+`/ingest ~/notes` indexes a file or folder (text, markdown, code, json, csv and
+similar; hidden folders and files over 1 MB are skipped; at most 500 files per
+run). Before each answer Lily searches the notes for your message and gives the
+3 best passages to the model. Searching is SQLite full-text search (FTS5) with
+word stemming, so there is no embedding model and nothing extra to install.
+`/notes` lists what is indexed, `/forget <source>` removes one source, and
+indexing the same file again replaces its old passages. The database is
+`data/rag.db` (gitignored).
 
 ## Rules of this repo
 
@@ -79,12 +90,13 @@ lily/llm/providers/  openai_compat.py (standard library only)
 lily/tools/        Tools sub orchestrator, registry, loader, permissions
 lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_search
 lily/tools/mcp/    MCP client, adapter and config
+lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
 lily/ui/           terminal loop, rich renderer, slash commands
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
 ```
 
-Coming next: `lily/rag/`, `lily/memory/`.
+Coming next: `lily/memory/` (run log, feedback, lessons, dataset export).
 
 ## License
 

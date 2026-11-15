@@ -13,6 +13,7 @@ What `run` takes and returns, per layer:
   tools.describe() / tools.reload() -> str (used by /tools and /reload)
   rag.run(state, query=str)    -> None (appends snippets to state.context)
   rag.search(query, limit)     -> list[str] (used by the rag_search tool)
+  rag.ingest(path) / describe() / forget(source) -> str (used by /ingest /notes /forget)
 """
 from typing import Protocol
 
