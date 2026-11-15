@@ -51,6 +51,23 @@ and never stops Lily.
 `/reload`. Its tools appear as `lilyai__<tool>`. Only the Streamable HTTP
 transport is supported.
 
+## Updating (Termux)
+
+```bash
+bash ~/Terminal_Lily/scripts/update.sh
+```
+
+It pulls the latest version from GitHub, lists what changed, and reinstalls
+Python packages only if `requirements.txt` changed. It never overwrites your
+own edits: if you changed a tracked file it stops and tells you. Your `.env`
+and `data/` are never touched. Restart Lily afterwards.
+
+For a short command, run this once and reopen Termux, then type `lily-update`:
+
+```bash
+echo "alias lily-update='bash ~/Terminal_Lily/scripts/update.sh'" >> ~/.bashrc
+```
+
 ## Notes (RAG)
 
 `/ingest ~/notes` indexes a file or folder (text, markdown, code, json, csv and
@@ -129,6 +146,7 @@ you -> ui -> main orchestrator -> agent loop
 main.py            entry point
 config/            settings, models.toml, mcp_servers.toml, languages.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
+scripts/           setup_termux.sh (first install), update.sh (update from GitHub)
 lily/              orchestrator, agent_loop, router, state, bootstrap
 lily/llm/          LLM sub orchestrator, prompt builder, parser, profile picker
 lily/llm/providers/  openai_compat.py (standard library only)
