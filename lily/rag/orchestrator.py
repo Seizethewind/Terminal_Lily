@@ -1,5 +1,6 @@
 """RAG sub orchestrator: find notes for a question, and manage what is indexed."""
 from lily.rag import ingest, retriever
+from lily.rag.chunker import chunk
 from lily.rag.store import Store
 
 DB_NAME = "rag.db"
@@ -25,6 +26,10 @@ class RagOrchestrator:
 
     def search(self, query, limit=5):
         return retriever.find(self.store, query, limit)
+
+    def remember(self, source, text):
+        """Index text under a source name (the data layer uses this for lessons)."""
+        self.store.replace(source, chunk(text))
 
     def ingest(self, path):
         files, chunks = ingest.ingest(self.store, path)

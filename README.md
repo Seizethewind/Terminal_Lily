@@ -6,9 +6,10 @@ run by its own sub orchestrator and all coordinated by one main orchestrator:
 - **LLM**: talks to your freellmapi router (`auto`, `auto:fast`, `auto:smart`)
 - **Tools**: shell, files, web, Termux API, the LilyAi MCP, and your own plugins
 - **RAG**: her notes and documents, searched with SQLite
+- **Data layer**: run log, your feedback, lessons, history and a dataset export
 
 > Status: building in layers. Done: skeleton, config, UI, main orchestrator,
-> the LLM layer, the Tools layer and RAG. Next: the data layer.
+> the LLM layer, the Tools layer, RAG and the data layer.
 
 ## Quick start (Termux)
 
@@ -21,7 +22,9 @@ python main.py
 ```
 
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
-`/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/exit`.
+`/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
+`/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
+`/export [all]`, `/stats`, `/exit`.
 
 ## Choosing a model
 
@@ -59,6 +62,28 @@ word stemming, so there is no embedding model and nothing extra to install.
 indexing the same file again replaces its old passages. The database is
 `data/rag.db` (gitignored).
 
+## Learning from results (data layer)
+
+Everything Lily does becomes data in `data/lily.db` (gitignored, local only):
+every message with the profile asked for, the model that really answered
+(from the router's `X-Routed-Via` header), the tools used, steps, time and any
+error. Tool outputs and file contents are **not** stored, only tool names.
+
+- `/good` and `/bad` rate Lily's last answer (add a note if you like).
+- **Profile learning:** while the profile is `auto` and no `[rules]` word
+  matches, Lily looks at past answers to similar questions that you rated. Two
+  or more agreeing verdicts (good on `smart`, or bad on `fast`/`auto`) make her
+  ask the router for `auto:smart` or `auto:fast` instead. A profile you set by
+  hand always wins.
+- `/lesson <text>` teaches her something. Lessons are indexed as notes, so they
+  come back when relevant. `/lessons` lists them, `/unlearn <n>` removes one.
+- `/summarize` asks the model to condense recent chats into a note she keeps.
+- `/history [n]` shows recent exchanges. `/stats` shows runs and verdicts per
+  profile.
+- `/export` writes chats you rated `/good` to `data/dataset.jsonl` (chat
+  messages format, one chat per line) for later fine-tuning; `/export all`
+  writes every finished chat.
+
 ## Rules of this repo
 
 - Every Python file is **120 lines or fewer** and does **one thing**
@@ -91,12 +116,13 @@ lily/tools/        Tools sub orchestrator, registry, loader, permissions
 lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_search
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
+lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export
 lily/ui/           terminal loop, rich renderer, slash commands
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
 ```
 
-Coming next: `lily/memory/` (run log, feedback, lessons, dataset export).
+All planned layers are in. Next steps are up to you.
 
 ## License
 

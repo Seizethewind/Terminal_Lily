@@ -1,8 +1,13 @@
 """MAIN orchestrator: owns the state, the router and the agent loop."""
+import time
+
 from lily.agent_loop import AgentLoop
 from lily.router import Router
 from lily.state import State
 from lily.utils.errors import LilyError
+from lily.utils.logger import get_logger
+
+log = get_logger("lily")
 
 
 class Lily:
@@ -18,7 +23,26 @@ class Lily:
         self.router.register(sub)
 
     def handle(self, text):
-        return self.loop.run(self.state, text)
+        started = time.monotonic()
+        try:
+            answer = self.loop.run(self.state, text)
+        except Exception as err:
+            self._record(text, "", started, str(err))
+            raise
+        self._record(text, answer, started)
+        return answer
+
+    def _record(self, text, answer, started, error=""):
+        """Give the finished turn to the memory layer, if installed. Never fails the chat."""
+        memory = self.router.get("memory")
+        if memory is None:
+            return
+        millis = int((time.monotonic() - started) * 1000)
+        record = {"user_text": text, "answer": answer, "error": error, "latency_ms": millis, **self.loop.last}
+        try:
+            memory.run(self.state, record=record)
+        except Exception:   # noqa: BLE001 - logging a turn must never break the chat
+            log.exception("could not record the run")
 
     @property
     def model(self):

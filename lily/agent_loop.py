@@ -10,8 +10,10 @@ class AgentLoop:
     def __init__(self, router, max_steps=8):
         self.router = router
         self.max_steps = max_steps
+        self.last = {"tools": [], "steps": 0}   # what the latest turn did (for the run log)
 
     def run(self, state, user_text):
+        self.last = {"tools": [], "steps": 0}
         state.trim()
         state.context.clear()
         state.add("user", user_text)
@@ -21,11 +23,13 @@ class AgentLoop:
             if llm is None:
                 return NO_LLM
             result = llm.run(state)
+            self.last["steps"] += 1
             target = self.router.route(result)
             if target is None:
                 text = result.get("text", "")
                 state.add("assistant", text)
                 return text
+            self.last["tools"].append(result.get("name", ""))
             state.add_tool_call(result)
             state.add_tool_result(result, self._act(target, state, result))
         return f"I stopped after {self.max_steps} steps without a final answer."

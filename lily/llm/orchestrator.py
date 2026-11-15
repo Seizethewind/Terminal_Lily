@@ -16,12 +16,15 @@ class LLMOrchestrator:
             settings.base_url, settings.api_key, settings.timeout
         )
         self.last_routed_via = ""   # which model really answered (for the run log)
+        self.last_profile = ""      # which profile was asked for (for the run log)
 
     def run(self, state, **kwargs):
         profiles = self.lily.settings.profiles
-        key = profile_picker.pick(state, self.lily.settings.rules)
+        suggest = getattr(self.lily.router.get("memory"), "suggest_profile", None)
+        key = profile_picker.pick(state, self.lily.settings.rules, suggest)
         if key not in profiles:
             key = state.profile
+        self.last_profile = key
         payload = prompt_builder.build(profiles[key], state.view(), self._tool_schemas())
         reply = self.provider.chat(payload)
         self.last_routed_via = reply.routed_via
