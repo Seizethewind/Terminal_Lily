@@ -24,7 +24,7 @@ python main.py
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
 `/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
 `/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
-`/export [all]`, `/stats`, `/exit`.
+`/export [all]`, `/stats`, `/code`, `/exit`.
 
 ## Choosing a model
 
@@ -84,6 +84,26 @@ error. Tool outputs and file contents are **not** stored, only tool names.
   messages format, one chat per line) for later fine-tuning; `/export all`
   writes every finished chat.
 
+## Coding taxonomy
+
+Every code block in a chat (yours or Lily's) is filed by language, as
+`group > family > language`, for example `programming > systems > rust`. It
+happens automatically after each answer, costs no API calls (it reads the
+``` fence tag, or guesses an untagged block from its content), and the code
+is stored in `data/lily.db`.
+
+**Any language is stored.** The list in `config/languages.toml` (about 50
+languages, with aliases such as `py`, `c++`, `rs`) only decides the tree. A
+language that is not on the list is kept under `unknown` and flagged, so
+nothing is lost. Add it to the file and run `/code scan` to file it properly.
+
+- `/code` shows languages with block and chat counts.
+- `/code show <language> [n]` lists the latest blocks (aliases work).
+- `/code scan` re-files every stored chat (after editing the list, or to
+  fill in chats from before this feature).
+- `/code export <language>` writes the chats containing that language to
+  `data/code_<language>.jsonl`.
+
 ## Rules of this repo
 
 - Every Python file is **120 lines or fewer** and does **one thing**
@@ -107,7 +127,7 @@ you -> ui -> main orchestrator -> agent loop
 
 ```
 main.py            entry point
-config/            settings, models.toml, mcp_servers.toml, system_prompt.txt
+config/            settings, models.toml, mcp_servers.toml, languages.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
 lily/              orchestrator, agent_loop, router, state, bootstrap
 lily/llm/          LLM sub orchestrator, prompt builder, parser, profile picker
@@ -116,7 +136,7 @@ lily/tools/        Tools sub orchestrator, registry, loader, permissions
 lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_search
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
-lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export
+lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding taxonomy
 lily/ui/           terminal loop, rich renderer, slash commands
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
