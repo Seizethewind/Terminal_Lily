@@ -44,7 +44,11 @@ class Renderer:
         if status:
             status.stop()   # the spinner would draw over the question
         try:
-            answer = self.console.input(f"[yellow]{escape(question)} [y/N][/] ")
+            head, _, body = question.partition("\n")
+            self.console.print(f"\n[bold]{escape(head)}[/]")
+            if body:
+                self.console.print(escape(body), style="dim", highlight=False)
+            answer = self.console.input(f"[bold cyan]{escape('Allow? [y/N]')}[/] ")
         finally:
             if status:
                 status.start()
