@@ -14,6 +14,10 @@ What `run` takes and returns, per layer:
   rag.run(state, query=str)    -> None (appends snippets to state.context)
   rag.search(query, limit)     -> list[str] (used by the rag_search tool)
   rag.ingest(path) / describe() / forget(source) -> str (used by /ingest /notes /forget)
+  rag.remember(source, text)   -> None (index text, e.g. a lesson, under a source name)
+  memory.run(state, record=dict) -> None (stores one finished turn in the run log)
+  memory.suggest_profile(text) -> "fast" | "smart" | None (learned from /good and /bad)
+  llm.last_profile / llm.last_routed_via -> what the latest llm call used (for the run log)
 """
 from typing import Protocol
 

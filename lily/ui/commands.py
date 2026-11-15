@@ -32,7 +32,7 @@ def _profile(lily, args):
     return f"profile set to {args[0]} ({lily.model})"
 
 
-def _layer(lily, name):
+def layer(lily, name):
     sub = lily.router.get(name)
     if sub is None:
         raise LilyError(f"the {name} layer is not installed")
@@ -41,31 +41,31 @@ def _layer(lily, name):
 
 @command("tools", "list loaded tools and any that failed to load")
 def _tools(lily, args):
-    return _layer(lily, "tools").describe()
+    return layer(lily, "tools").describe()
 
 
 @command("reload", "reload plugins and MCP servers")
 def _reload(lily, args):
-    return _layer(lily, "tools").reload()
+    return layer(lily, "tools").reload()
 
 
 @command("ingest", "add a file or folder to Lily's notes, e.g. /ingest ~/notes")
 def _ingest(lily, args):
     if not args:
         return "Usage: /ingest <file or folder>"
-    return _layer(lily, "rag").ingest(" ".join(args))
+    return layer(lily, "rag").ingest(" ".join(args))
 
 
 @command("notes", "list what is in Lily's notes")
 def _notes(lily, args):
-    return _layer(lily, "rag").describe()
+    return layer(lily, "rag").describe()
 
 
 @command("forget", "remove one source from the notes, e.g. /forget /path/file.md")
 def _forget(lily, args):
     if not args:
         return "Usage: /forget <source as shown by /notes>"
-    return _layer(lily, "rag").forget(" ".join(args))
+    return layer(lily, "rag").forget(" ".join(args))
 
 
 @command("exit", "leave Lily")
@@ -82,3 +82,6 @@ def run(lily, line):
     if name not in COMMANDS:
         return f"Unknown command /{name}. Try /help."
     return COMMANDS[name][0](lily, args)
+
+
+from lily.ui import commands_memory  # noqa: E402,F401  (registers the data layer commands)

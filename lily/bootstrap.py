@@ -3,7 +3,10 @@ import importlib
 
 from lily.orchestrator import Lily
 
-SUBS = ("lily.llm.orchestrator", "lily.tools.orchestrator", "lily.rag.orchestrator")
+SUBS = (
+    "lily.llm.orchestrator", "lily.tools.orchestrator",
+    "lily.rag.orchestrator", "lily.memory.orchestrator",
+)
 
 
 def build(settings):
