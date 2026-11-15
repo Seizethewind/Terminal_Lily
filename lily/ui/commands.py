@@ -1,4 +1,6 @@
 """Slash commands. Each command is a small function registered by name."""
+from lily.utils.errors import LilyError
+
 EXIT = "__exit__"
 COMMANDS = {}
 
@@ -28,6 +30,23 @@ def _profile(lily, args):
         return f"profile: {lily.state.profile} ({lily.model}). Options: {options}"
     lily.set_profile(args[0])
     return f"profile set to {args[0]} ({lily.model})"
+
+
+def _tools_layer(lily):
+    tools = lily.router.get("tools")
+    if tools is None:
+        raise LilyError("the tools layer is not installed")
+    return tools
+
+
+@command("tools", "list loaded tools and any that failed to load")
+def _tools(lily, args):
+    return _tools_layer(lily).describe()
+
+
+@command("reload", "reload plugins and MCP servers")
+def _reload(lily, args):
+    return _tools_layer(lily).reload()
 
 
 @command("exit", "leave Lily")

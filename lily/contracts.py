@@ -10,7 +10,9 @@ What `run` takes and returns, per layer:
   tools.run(state, call=dict)  -> str (the tool's output)
   tools.schemas()              -> list of OpenAI-style tool definitions
                                   (optional; the llm layer offers them to the model)
+  tools.describe() / tools.reload() -> str (used by /tools and /reload)
   rag.run(state, query=str)    -> None (appends snippets to state.context)
+  rag.search(query, limit)     -> list[str] (used by the rag_search tool)
 """
 from typing import Protocol
 
