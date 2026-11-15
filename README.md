@@ -121,9 +121,9 @@ nothing is lost. Add it to the file and run `/code scan` to file it properly.
 - `/code export <language>` writes the chats containing that language to
   `data/code_<language>.jsonl`.
 
-## Entity taxonomy (entity, location, object)
+## Taxonomy of things and subjects (7 classes)
 
-Everything else Lily hears about is sorted into three classes, each with basic
+Everything else Lily hears about is sorted into seven classes, each with basic
 subclasses:
 
 | Class | Subclasses |
@@ -131,19 +131,25 @@ subclasses:
 | **entity** (living things, groups of people) | person, animal, plant, organization |
 | **location** | country, city, region, water, landform, place |
 | **object** | device, vehicle, tool, food, clothing |
+| **literature** | genre, form, device, author |
+| **science** | physics, chemistry, biology, astronomy, earth |
+| **math** | arithmetic, algebra, geometry, trigonometry, calculus, statistics, linear algebra |
+| **history** | era, event, civilization, institution |
 
 After each answer Lily scans your message and her answer for the words listed in
 `config/entities.toml` and files each one as `class > subclass` (it also finds
-plurals, and ignores code). No API calls. It is a **word list**, so it cannot
-tell meanings apart ("mouse" is always a device) and it only knows the words
-you give it.
+plurals and phrases like "black hole", and ignores code). No API calls. It is a
+**word list**, so it cannot tell meanings apart ("mouse" is always a device) and
+it only knows the words you give it. The subject classes leave out everyday
+words such as "force", "cell" or "limit" on purpose, so they are not filed by
+accident.
 
 - `/entity` shows the tree with counts, `/entity classes` lists the subclasses.
 - `/entity show <class[/sub]>` lists the words filed there, for example
-  `/entity show object/device`.
+  `/entity show science/biology`.
 - `/entity find <word>` shows the latest chats that mention a word.
 - `/entity add <word> <class/sub>` teaches her a word, for example
-  `/entity add seize entity/person` or `/entity add cebu pines location/place`.
+  `/entity add seize entity/person` or `/entity add force science/physics`.
   Subclasses are free: a new name makes a new subclass. `/entity remove <word>`
   removes one you added.
 - `/entity scan` re-files all stored chats after you add words or edit the file.

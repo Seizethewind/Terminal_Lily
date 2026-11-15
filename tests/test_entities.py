@@ -30,7 +30,7 @@ class LabelTests(unittest.TestCase):
 
 
 class TaxonomyTests(unittest.TestCase):
-    def test_the_shipped_list_has_all_three_classes_and_no_clashes(self):
+    def test_the_shipped_list_has_all_seven_classes_and_no_clashes(self):
         data = tomllib.loads(PATH.read_text(encoding="utf-8"))
         self.assertEqual(set(data), set(CLASSES))
         listed = [w.lower() for subs in data.values() for words in subs.values() for w in words]
@@ -42,6 +42,10 @@ class TaxonomyTests(unittest.TestCase):
         self.assertEqual(TAX.words["dog"], ("entity", "animal"))
         self.assertEqual(TAX.words["manila"], ("location", "city"))
         self.assertEqual(TAX.words["phone"], ("object", "device"))
+        self.assertEqual(TAX.words["sonnet"], ("literature", "form"))
+        self.assertEqual(TAX.words["gravity"], ("science", "physics"))
+        self.assertEqual(TAX.words["derivative"], ("math", "calculus"))
+        self.assertEqual(TAX.words["renaissance"], ("history", "era"))
 
     def test_your_own_words_win_and_describe_counts_them(self):
         tax = Taxonomy(extra=[("dog", "object", "toy"), ("xyzzy", "object", "thing")])
@@ -69,6 +73,14 @@ class FindTests(unittest.TestCase):
     def test_code_is_ignored(self):
         text = "use `mouse` here\n```python\nkey = dog\n```\nbut a real cat"
         self.assertEqual(find(PATTERN, text), {"cat": 1})
+
+    def test_subject_classes_find_phrases(self):
+        text = "The Cold War and a black hole: a sonnet about the Pythagorean theorem."
+        self.assertEqual(find(PATTERN, text), {
+            "cold war": 1, "black hole": 1, "sonnet": 1, "pythagorean theorem": 1})
+
+    def test_everyday_words_are_not_filed_as_subjects(self):
+        self.assertEqual(find(PATTERN, "the force of a plot to limit a cell in a set"), {})
 
     def test_empty_inputs(self):
         self.assertEqual(find(PATTERN, None), {})

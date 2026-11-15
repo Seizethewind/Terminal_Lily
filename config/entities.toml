@@ -1,10 +1,16 @@
-# The entity taxonomy: 3 classes, each split into subclasses of known words.
-#   entity   = living things and groups of people
-#   location = places of any size
-#   object   = things you can hold, use, eat or ride
+# The entity taxonomy: 7 classes, each split into subclasses of known words.
+#   entity     = living things and groups of people
+#   location   = places of any size
+#   object     = things you can hold, use, eat or ride
+#   literature = writing: genres, forms, devices, authors
+#   science    = physics, chemistry, biology, astronomy, earth
+#   math       = arithmetic, algebra, geometry, calculus, statistics...
+#   history    = eras, events, civilizations, institutions
 #
 # Lily files every mention of these words in your chats under class > subclass.
 # It is a word list, so it cannot tell meanings apart (the word "mouse" is always a device).
+# Plain everyday words are left out of the subject classes on purpose (no "force", "cell",
+# "plot" or "limit"), because they would be filed by accident. Add your own if you want them.
 # A word listed twice goes to the first place it appears. Code blocks are ignored.
 #
 # Add words here, or inside Lily: /entity add <word> <class>/<subclass>
@@ -30,3 +36,31 @@ vehicle = ["car", "bike", "bicycle", "motorcycle", "bus", "train", "plane", "boa
 tool = ["hammer", "screwdriver", "knife", "pen", "pencil", "scissors", "wrench", "ladder", "rope", "key"]
 food = ["rice", "bread", "egg", "coffee", "tea", "milk", "sugar", "salt", "pizza", "burger", "noodles", "adobo", "soup", "cake", "apple", "banana", "mango"]
 clothing = ["shirt", "pants", "shoes", "hat", "jacket", "dress", "bag", "glasses", "slippers"]
+
+[literature]
+genre = ["poem", "poetry", "novel", "short story", "fable", "myth", "legend", "fairy tale", "epic", "tragedy", "comedy", "biography", "memoir", "essay", "fiction", "folklore"]
+form = ["sonnet", "haiku", "limerick", "ballad", "stanza", "verse", "prose", "free verse", "couplet"]
+device = ["metaphor", "simile", "irony", "allegory", "symbolism", "foreshadowing", "personification", "alliteration", "protagonist", "antagonist", "narrator", "flashback"]
+author = ["shakespeare", "homer", "dickens", "austen", "tolstoy", "hemingway", "orwell", "dante", "cervantes", "tolkien", "twain", "poe"]
+
+[science]
+physics = ["gravity", "velocity", "momentum", "quantum", "relativity", "magnetism", "electricity", "thermodynamics", "photon", "electron", "proton", "neutron", "friction", "wavelength", "newton"]
+chemistry = ["atom", "molecule", "periodic table", "chemical reaction", "oxidation", "isotope", "catalyst", "polymer", "acid", "ph level", "solvent", "chemistry"]
+biology = ["dna", "rna", "gene", "protein", "photosynthesis", "evolution", "bacteria", "virus", "enzyme", "ecosystem", "mitosis", "chromosome", "natural selection", "organism", "biology"]
+astronomy = ["planet", "galaxy", "black hole", "telescope", "asteroid", "comet", "supernova", "orbit", "solar system", "nebula", "astronomy", "constellation"]
+earth = ["earthquake", "plate tectonics", "climate", "weather", "erosion", "mineral", "fossil", "atmosphere", "hurricane", "typhoon", "tsunami", "geology"]
+
+[math]
+arithmetic = ["addition", "subtraction", "multiplication", "division", "fraction", "decimal", "percentage", "prime number", "square root", "ratio", "arithmetic"]
+algebra = ["algebra", "equation", "variable", "polynomial", "quadratic", "linear equation", "exponent", "logarithm", "inequality"]
+geometry = ["geometry", "triangle", "circle", "rectangle", "angle", "polygon", "pythagorean theorem", "perimeter", "radius", "diameter", "hypotenuse"]
+trigonometry = ["trigonometry", "sine", "cosine", "radian", "unit circle"]
+calculus = ["calculus", "derivative", "integral", "differential equation", "gradient"]
+statistics = ["statistics", "probability", "median", "standard deviation", "variance", "normal distribution", "correlation", "regression", "hypothesis test"]
+"linear algebra" = ["matrix", "vector", "eigenvalue", "determinant", "linear algebra"]
+
+[history]
+era = ["ancient", "medieval", "renaissance", "middle ages", "stone age", "bronze age", "iron age", "industrial revolution", "colonial period"]
+event = ["world war", "cold war", "french revolution", "american revolution", "great depression", "black death", "crusade", "revolution"]
+civilization = ["roman empire", "ottoman empire", "mongol empire", "byzantine", "empire", "dynasty", "kingdom", "pharaoh", "samurai", "viking", "aztec", "maya", "inca"]
+institution = ["monarchy", "republic", "parliament", "feudalism", "colonialism", "treaty", "constitution", "democracy"]
