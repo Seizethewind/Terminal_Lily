@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS code_blocks (
     id INTEGER PRIMARY KEY, run_id INTEGER, source TEXT, language TEXT, grp TEXT, family TEXT,
     known INTEGER, guessed INTEGER, lines INTEGER, code TEXT);
 CREATE INDEX IF NOT EXISTS code_blocks_language ON code_blocks(language);
+CREATE TABLE IF NOT EXISTS entity_terms (name TEXT PRIMARY KEY, cls TEXT, sub TEXT);
+CREATE TABLE IF NOT EXISTS entity_mentions (
+    id INTEGER PRIMARY KEY, run_id INTEGER, name TEXT, cls TEXT, sub TEXT, count INTEGER);
+CREATE INDEX IF NOT EXISTS entity_mentions_name ON entity_mentions(name);
 """
 
 

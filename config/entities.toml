@@ -1,0 +1,32 @@
+# The entity taxonomy: 3 classes, each split into subclasses of known words.
+#   entity   = living things and groups of people
+#   location = places of any size
+#   object   = things you can hold, use, eat or ride
+#
+# Lily files every mention of these words in your chats under class > subclass.
+# It is a word list, so it cannot tell meanings apart (the word "mouse" is always a device).
+# A word listed twice goes to the first place it appears. Code blocks are ignored.
+#
+# Add words here, or inside Lily: /entity add <word> <class>/<subclass>
+# Subclasses are free: write a new line to make one. Then run /entity scan.
+
+[entity]
+person = ["mother", "father", "mom", "dad", "brother", "sister", "friend", "teacher", "doctor", "student", "engineer", "developer", "child", "baby", "king", "queen"]
+animal = ["dog", "cat", "bird", "fish", "horse", "cow", "pig", "chicken", "duck", "rabbit", "snake", "lion", "tiger", "elephant", "monkey", "wolf", "fox", "frog", "bee", "carabao"]
+plant = ["tree", "flower", "grass", "rose", "bamboo", "mango tree", "coconut tree", "cactus", "fern", "moss", "vine"]
+organization = ["company", "school", "university", "government", "bank", "hospital", "team", "club", "army", "police", "church group"]
+
+[location]
+country = ["philippines", "japan", "china", "india", "korea", "usa", "united states", "canada", "brazil", "germany", "france", "england", "australia", "indonesia", "vietnam", "thailand", "singapore"]
+city = ["manila", "cebu", "davao", "quezon city", "tokyo", "seoul", "beijing", "london", "paris", "new york", "berlin", "sydney", "bangkok", "jakarta"]
+region = ["asia", "europe", "africa", "america", "antarctica", "luzon", "visayas", "mindanao", "province", "state"]
+water = ["ocean", "sea", "river", "lake", "pacific", "atlantic", "beach", "bay", "waterfall"]
+landform = ["mountain", "volcano", "island", "forest", "desert", "valley", "cave", "hill", "jungle"]
+place = ["house", "home", "office", "park", "market", "mall", "airport", "station", "church", "restaurant", "kitchen", "room", "street", "road", "bridge", "farm"]
+
+[object]
+device = ["phone", "laptop", "computer", "keyboard", "mouse", "monitor", "tablet", "router", "charger", "battery", "camera", "speaker", "headphones", "server", "printer"]
+vehicle = ["car", "bike", "bicycle", "motorcycle", "bus", "train", "plane", "boat", "ship", "truck", "jeepney", "tricycle"]
+tool = ["hammer", "screwdriver", "knife", "pen", "pencil", "scissors", "wrench", "ladder", "rope", "key"]
+food = ["rice", "bread", "egg", "coffee", "tea", "milk", "sugar", "salt", "pizza", "burger", "noodles", "adobo", "soup", "cake", "apple", "banana", "mango"]
+clothing = ["shirt", "pants", "shoes", "hat", "jacket", "dress", "bag", "glasses", "slippers"]
