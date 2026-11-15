@@ -1,5 +1,6 @@
 """Data layer sub orchestrator: records every turn and turns your verdicts into learning."""
 from lily.memory import export_dataset, feedback, history, lessons, profile_hints, run_log, summarizer
+from lily.memory.code_taxonomy import CodeTaxonomy
 from lily.memory.db import Database
 from lily.utils.errors import LilyError
 
@@ -14,6 +15,7 @@ class MemoryOrchestrator:
         self.lily = lily
         self._db = db
         self.last_run_id = None
+        self.code = CodeTaxonomy(lambda: self.db)   # the coding taxonomy
 
     @property
     def db(self):
@@ -36,6 +38,10 @@ class MemoryOrchestrator:
         record.setdefault("profile", getattr(llm, "last_profile", ""))
         record.setdefault("routed_via", getattr(llm, "last_routed_via", ""))
         self.last_run_id = run_log.record(self.db, record)
+        try:
+            self.code.index_run(self.last_run_id, record.get("user_text", ""), record.get("answer", ""))
+        except LilyError:
+            pass   # the code index is a bonus; the run itself is already saved
 
     def suggest_profile(self, text):
         try:

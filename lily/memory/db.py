@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS feedback (
     id INTEGER PRIMARY KEY, run_id INTEGER, rating INTEGER, note TEXT, ts TEXT);
 CREATE TABLE IF NOT EXISTS lessons (
     id INTEGER PRIMARY KEY, ts TEXT, kind TEXT, text TEXT);
+CREATE TABLE IF NOT EXISTS code_blocks (
+    id INTEGER PRIMARY KEY, run_id INTEGER, source TEXT, language TEXT, grp TEXT, family TEXT,
+    known INTEGER, guessed INTEGER, lines INTEGER, code TEXT);
+CREATE INDEX IF NOT EXISTS code_blocks_language ON code_blocks(language);
 """
 
 

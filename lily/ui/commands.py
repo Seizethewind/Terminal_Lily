@@ -84,4 +84,4 @@ def run(lily, line):
     return COMMANDS[name][0](lily, args)
 
 
-from lily.ui import commands_memory  # noqa: E402,F401  (registers the data layer commands)
+from lily.ui import commands_code, commands_memory  # noqa: E402,F401  (register their commands)

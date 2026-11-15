@@ -1,0 +1,64 @@
+# Programming languages Lily recognises in code blocks, grouped for the coding taxonomy.
+# Anything NOT listed here is still stored (under group "unknown"), so nothing is lost.
+# To teach Lily a new language: add a line below, then run /code scan.
+#
+# group: programming | markup | data | query | shell | config
+# family: free text to build the tree (group > family > language)
+
+# Fence tags that are not code at all (they are skipped, not stored).
+ignore = ["text", "txt", "plaintext", "plain", "output", "log", "console-output", "none"]
+
+[languages]
+python     = { group = "programming", family = "scripting", aliases = ["py", "python3", "py3"] }
+javascript = { group = "programming", family = "web", aliases = ["js", "node", "nodejs", "jsx", "mjs"] }
+typescript = { group = "programming", family = "web", aliases = ["ts", "tsx"] }
+java       = { group = "programming", family = "jvm" }
+kotlin     = { group = "programming", family = "jvm", aliases = ["kt", "kts"] }
+scala      = { group = "programming", family = "jvm" }
+groovy     = { group = "programming", family = "jvm", aliases = ["gradle"] }
+clojure    = { group = "programming", family = "functional", aliases = ["clj"] }
+swift      = { group = "programming", family = "apple" }
+objective-c = { group = "programming", family = "apple", aliases = ["objc", "objectivec"] }
+c          = { group = "programming", family = "systems", aliases = ["h"] }
+cpp        = { group = "programming", family = "systems", aliases = ["c++", "cc", "cxx", "hpp"] }
+csharp     = { group = "programming", family = "dotnet", aliases = ["c#", "cs"] }
+fsharp     = { group = "programming", family = "dotnet", aliases = ["f#", "fs"] }
+go         = { group = "programming", family = "systems", aliases = ["golang"] }
+rust       = { group = "programming", family = "systems", aliases = ["rs"] }
+zig        = { group = "programming", family = "systems" }
+ruby       = { group = "programming", family = "scripting", aliases = ["rb"] }
+php        = { group = "programming", family = "web" }
+perl       = { group = "programming", family = "scripting", aliases = ["pl"] }
+lua        = { group = "programming", family = "scripting" }
+r          = { group = "programming", family = "data science" }
+julia      = { group = "programming", family = "data science", aliases = ["jl"] }
+dart       = { group = "programming", family = "mobile" }
+haskell    = { group = "programming", family = "functional", aliases = ["hs"] }
+elixir     = { group = "programming", family = "functional", aliases = ["ex", "exs"] }
+erlang     = { group = "programming", family = "functional", aliases = ["erl"] }
+ocaml      = { group = "programming", family = "functional", aliases = ["ml"] }
+assembly   = { group = "programming", family = "systems", aliases = ["asm", "nasm", "s"] }
+solidity   = { group = "programming", family = "blockchain", aliases = ["sol"] }
+bash       = { group = "shell", family = "unix", aliases = ["sh", "shell", "zsh", "shellscript", "terminal"] }
+fish       = { group = "shell", family = "unix" }
+powershell = { group = "shell", family = "windows", aliases = ["ps1", "pwsh"] }
+batch      = { group = "shell", family = "windows", aliases = ["bat", "cmd"] }
+sql        = { group = "query", family = "relational", aliases = ["mysql", "postgresql", "postgres", "sqlite", "plsql"] }
+graphql    = { group = "query", family = "api", aliases = ["gql"] }
+html       = { group = "markup", family = "web", aliases = ["htm"] }
+css        = { group = "markup", family = "web", aliases = ["scss", "sass", "less"] }
+xml        = { group = "markup", family = "data" }
+markdown   = { group = "markup", family = "text", aliases = ["md"] }
+latex      = { group = "markup", family = "text", aliases = ["tex"] }
+mermaid    = { group = "markup", family = "diagram" }
+json       = { group = "data", family = "interchange", aliases = ["jsonc", "json5"] }
+yaml       = { group = "data", family = "interchange", aliases = ["yml"] }
+toml       = { group = "data", family = "interchange" }
+csv        = { group = "data", family = "tabular" }
+ini        = { group = "config", family = "files", aliases = ["conf", "cfg", "properties"] }
+dockerfile = { group = "config", family = "devops", aliases = ["docker"] }
+makefile   = { group = "config", family = "devops", aliases = ["make"] }
+cmake      = { group = "config", family = "devops" }
+nginx      = { group = "config", family = "devops" }
+terraform  = { group = "config", family = "devops", aliases = ["tf", "hcl"] }
+diff       = { group = "config", family = "vcs", aliases = ["patch"] }
