@@ -1,11 +1,12 @@
 # MCP servers Lily can use as tools (Streamable HTTP, URL + bearer token).
 # Never put a token in this file: put it in .env and name the variable in auth_env.
+# The url must be the full MCP endpoint (usually ends in /mcp).
 # Type /reload in Lily after changing this file.
 #
-# To switch the LilyAi MCP on: fill in the real url and set enabled = true.
+# To switch the LilyAi MCP on: fill in the real url, set MCP_API_KEYS in .env.
 
 [[servers]]
 name = "lilyai"
-url = "https://your-lilyai-mcp-url"
-auth_env = "LILYAI_MCP_TOKEN"
-enabled = false
+url = "https://your-lilyai-mcp-url/mcp"
+auth_env = "MCP_API_KEYS"
+enabled = true
