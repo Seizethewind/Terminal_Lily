@@ -22,6 +22,11 @@ CREATE TABLE IF NOT EXISTS entity_terms (name TEXT PRIMARY KEY, cls TEXT, sub TE
 CREATE TABLE IF NOT EXISTS entity_mentions (
     id INTEGER PRIMARY KEY, run_id INTEGER, name TEXT, cls TEXT, sub TEXT, count INTEGER);
 CREATE INDEX IF NOT EXISTS entity_mentions_name ON entity_mentions(name);
+CREATE TABLE IF NOT EXISTS taxonomy_nodes (path TEXT PRIMARY KEY, description TEXT, ts TEXT);
+CREATE TABLE IF NOT EXISTS taxonomy_labels (
+    id INTEGER PRIMARY KEY, kind TEXT, ref TEXT, path TEXT, source TEXT, ts TEXT,
+    UNIQUE (kind, ref, path));
+CREATE INDEX IF NOT EXISTS taxonomy_labels_path ON taxonomy_labels(path);
 """
 
 

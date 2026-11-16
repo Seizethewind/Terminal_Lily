@@ -24,8 +24,8 @@ class RagOrchestrator:
     def run(self, state, query="", **kwargs):
         state.context.extend(retriever.find(self.store, query, TOP))
 
-    def search(self, query, limit=5):
-        return retriever.find(self.store, query, limit)
+    def search(self, query, limit=5, sources=None):
+        return retriever.find(self.store, query, limit, sources)
 
     def remember(self, source, text):
         """Index text under a source name (the data layer uses this for lessons)."""

@@ -84,4 +84,4 @@ def run(lily, line):
     return COMMANDS[name][0](lily, args)
 
 
-from lily.ui import commands_code, commands_entity, commands_memory  # noqa: E402,F401  (register their commands)
+from lily.ui import commands_code, commands_entity, commands_memory, commands_taxonomy  # noqa: E402,F401

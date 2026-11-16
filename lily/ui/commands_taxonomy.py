@@ -1,0 +1,50 @@
+"""The /taxonomy command: the universal data taxonomy (organize and filter what Lily stored)."""
+from lily.ui.commands import command, layer
+
+USAGE = """Usage:
+/taxonomy                              the tree with record counts
+/taxonomy add <path> [description]     new subcategory, e.g. study/history
+/taxonomy remove <path>                remove a subcategory you added (it must be empty)
+/taxonomy label <kind> <path> <ref>    file a record, e.g. note study/history /sd/ww2.md
+/taxonomy unlabel <kind> <path|all> <ref>
+/taxonomy of <kind> <ref>              the labels of one record
+/taxonomy show [all] <path> [path...]  records filed there (all = in every path)
+/taxonomy unclassified [kind]          records with no label yet (default: run)
+/taxonomy search <path> <question>     search only the notes filed there
+/taxonomy scan                         redo the automatic labels of every chat
+kinds: run (ref = chat number), note (ref = source shown by /notes)"""
+
+
+def _lines(refs):
+    return "\n".join(f"{kind} {ref}" for kind, ref in refs) or "nothing filed there"
+
+
+@command("taxonomy", "organize stored data: /taxonomy, /taxonomy add|label|show|search ...")
+def _taxonomy(lily, args):
+    tax = layer(lily, "memory").taxonomy
+    action, rest = (args[0], args[1:]) if args else ("", [])
+    if action == "":
+        return tax.report()
+    if action == "scan":
+        return tax.scan()
+    if action == "add" and rest:
+        return tax.add(rest[0], " ".join(rest[1:]))
+    if action == "remove" and rest:
+        return tax.remove(rest[0])
+    if action == "label" and len(rest) >= 3:
+        return tax.classify(rest[0], " ".join(rest[2:]), rest[1])
+    if action == "unlabel" and len(rest) >= 3:
+        return tax.unclassify(rest[0], " ".join(rest[2:]), None if rest[1] == "all" else rest[1])
+    if action == "of" and len(rest) >= 2:
+        return tax.of(rest[0], " ".join(rest[1:]))
+    if action == "show" and rest:
+        mode, paths = ("all", rest[1:]) if rest[0] == "all" else ("any", rest)
+        return _lines(tax.refs(paths, mode=mode))
+    if action == "unclassified":
+        kind = rest[0] if rest else "run"
+        return "\n".join(f"{ref}  {text}".rstrip() for ref, text in tax.unclassified(kind)) or "nothing is unclassified"
+    if action == "search" and len(rest) >= 2:
+        sources = {ref for _, ref in tax.refs([rest[0]], kind="note")}
+        hits = layer(lily, "rag").search(" ".join(rest[1:]), 5, sources=sources)
+        return "\n---\n".join(hits) or f"no matching notes filed under {rest[0]}"
+    return USAGE
