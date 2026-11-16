@@ -242,9 +242,9 @@ nothing is lost. Add it to the file and run `/code scan` to file it properly.
 - `/code export <language>` writes the chats containing that language to
   `data/code_<language>.jsonl`.
 
-## Taxonomy of things and subjects (7 classes)
+## Taxonomy of things, subjects and computing (9 classes)
 
-Everything else Lily hears about is sorted into seven classes, each with basic
+Everything else Lily hears about is sorted into nine classes, each with basic
 subclasses:
 
 | Class | Subclasses |
@@ -256,23 +256,30 @@ subclasses:
 | **science** | physics, chemistry, biology, astronomy, earth |
 | **math** | arithmetic, algebra, geometry, trigonometry, calculus, statistics, linear algebra |
 | **history** | era, event, civilization, institution |
+| **computing** (computer science) | algorithm, data structure, os, network, database, ai, security, hardware, theory |
+| **programming** | concept, paradigm, practice, tool, web, language |
+
+**Code vs. words about code.** The coding taxonomy above files the code blocks
+themselves, by language (`/code`). The `computing` and `programming` classes
+file the words you write in sentences, such as "recursion", "linked list" or
+"python". Code blocks are ignored here, so the two never double count.
 
 After each answer Lily scans your message and her answer for the words listed in
 `config/entities.toml` and files each one as `class > subclass` (it also finds
 plurals and phrases like "black hole", and ignores code). No API calls. It is a
 **word list**, so it cannot tell meanings apart ("mouse" is always a device) and
 it only knows the words you give it. The subject classes leave out everyday
-words such as "force", "cell" or "limit" on purpose, so they are not filed by
-accident.
+words such as "force", "cell", "function" or "limit" on purpose, so they are
+not filed by accident.
 
 - `/entity` shows the tree with counts, `/entity classes` lists the subclasses.
 - `/entity show <class[/sub]>` lists the words filed there, for example
-  `/entity show science/biology`.
+  `/entity show science/biology` or `/entity show computing/data structure`.
 - `/entity find <word>` shows the latest chats that mention a word.
 - `/entity add <word> <class/sub>` teaches her a word, for example
   `/entity add seize entity/person` or `/entity add force science/physics`.
-  Subclasses are free: a new name makes a new subclass. `/entity remove <word>`
-  removes one you added.
+  Subclasses are free (spaces are fine): a new name makes a new subclass.
+  `/entity remove <word>` removes one you added.
 - `/entity scan` re-files all stored chats after you add words or edit the file.
 
 ## Rules of this repo

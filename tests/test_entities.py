@@ -30,7 +30,7 @@ class LabelTests(unittest.TestCase):
 
 
 class TaxonomyTests(unittest.TestCase):
-    def test_the_shipped_list_has_all_seven_classes_and_no_clashes(self):
+    def test_the_shipped_list_has_all_nine_classes_and_no_clashes(self):
         data = tomllib.loads(PATH.read_text(encoding="utf-8"))
         self.assertEqual(set(data), set(CLASSES))
         listed = [w.lower() for subs in data.values() for words in subs.values() for w in words]
@@ -46,6 +46,9 @@ class TaxonomyTests(unittest.TestCase):
         self.assertEqual(TAX.words["gravity"], ("science", "physics"))
         self.assertEqual(TAX.words["derivative"], ("math", "calculus"))
         self.assertEqual(TAX.words["renaissance"], ("history", "era"))
+        self.assertEqual(TAX.words["recursion"], ("programming", "concept"))
+        self.assertEqual(TAX.words["linked list"], ("computing", "data structure"))
+        self.assertEqual(TAX.words["python"], ("programming", "language"))
 
     def test_your_own_words_win_and_describe_counts_them(self):
         tax = Taxonomy(extra=[("dog", "object", "toy"), ("xyzzy", "object", "thing")])
@@ -79,8 +82,14 @@ class FindTests(unittest.TestCase):
         self.assertEqual(find(PATTERN, text), {
             "cold war": 1, "black hole": 1, "sonnet": 1, "pythagorean theorem": 1})
 
+    def test_computing_words_and_phrases(self):
+        text = "A hash table beats a linked list; machine learning in C++ and Python, then git push."
+        self.assertEqual(find(PATTERN, text), {
+            "hash table": 1, "linked list": 1, "machine learning": 1, "c++": 1, "python": 1, "git": 1})
+
     def test_everyday_words_are_not_filed_as_subjects(self):
-        self.assertEqual(find(PATTERN, "the force of a plot to limit a cell in a set"), {})
+        text = "the force of a plot to limit a cell in a set: a class function, a model, a token"
+        self.assertEqual(find(PATTERN, text), {})
 
     def test_empty_inputs(self):
         self.assertEqual(find(PATTERN, None), {})

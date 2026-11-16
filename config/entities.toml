@@ -1,4 +1,4 @@
-# The entity taxonomy: 7 classes, each split into subclasses of known words.
+# The entity taxonomy: 9 classes, each split into subclasses of known words.
 #   entity     = living things and groups of people
 #   location   = places of any size
 #   object     = things you can hold, use, eat or ride
@@ -6,11 +6,15 @@
 #   science    = physics, chemistry, biology, astronomy, earth
 #   math       = arithmetic, algebra, geometry, calculus, statistics...
 #   history    = eras, events, civilizations, institutions
+#   computing  = computer science: algorithms, data structures, systems, networks, AI...
+#   programming = how code is written: concepts, practice, tools, web, language names
+# (the code itself is filed by language by /code; this file only sorts the words you write about it)
 #
 # Lily files every mention of these words in your chats under class > subclass.
 # It is a word list, so it cannot tell meanings apart (the word "mouse" is always a device).
 # Plain everyday words are left out of the subject classes on purpose (no "force", "cell",
-# "plot" or "limit"), because they would be filed by accident. Add your own if you want them.
+# "plot", "limit", "function", "class", "model" or "token"), because they would be filed by accident.
+# Add your own if you want them.
 # A word listed twice goes to the first place it appears. Code blocks are ignored.
 #
 # Add words here, or inside Lily: /entity add <word> <class>/<subclass>
@@ -64,3 +68,22 @@ era = ["ancient", "medieval", "renaissance", "middle ages", "stone age", "bronze
 event = ["world war", "cold war", "french revolution", "american revolution", "great depression", "black death", "crusade", "revolution"]
 civilization = ["roman empire", "ottoman empire", "mongol empire", "byzantine", "empire", "dynasty", "kingdom", "pharaoh", "samurai", "viking", "aztec", "maya", "inca"]
 institution = ["monarchy", "republic", "parliament", "feudalism", "colonialism", "treaty", "constitution", "democracy"]
+
+[computing]
+algorithm = ["algorithm", "sorting", "binary search", "big o", "time complexity", "dynamic programming", "greedy algorithm", "heuristic", "hashing", "hash function", "bubble sort", "quicksort", "graph theory"]
+"data structure" = ["data structure", "array", "linked list", "hash table", "binary tree", "queue", "heap", "hashmap", "dictionary"]
+os = ["operating system", "kernel", "linux", "android", "macos", "ubuntu", "debian", "unix", "filesystem", "file system", "multithreading", "concurrency", "deadlock", "race condition", "virtual memory"]
+network = ["network", "internet", "protocol", "tcp", "udp", "ip address", "dns", "http", "https", "wifi", "bandwidth", "latency", "firewall", "vpn", "packet", "ethernet", "bluetooth", "localhost"]
+database = ["database", "sqlite", "postgres", "mysql", "mongodb", "redis", "query", "schema", "primary key", "foreign key", "orm", "full-text search"]
+ai = ["artificial intelligence", "machine learning", "deep learning", "neural network", "llm", "transformer", "embedding", "fine-tuning", "fine tuning", "training data", "dataset", "chatbot", "gpt", "rag", "reinforcement learning", "nlp", "computer vision"]
+security = ["encryption", "decryption", "cryptography", "malware", "phishing", "authentication", "authorization", "oauth", "vulnerability", "2fa", "ssl", "tls", "ransomware", "password"]
+hardware = ["cpu", "gpu", "ram", "ssd", "motherboard", "processor", "transistor", "firmware", "bios", "cache", "byte", "kilobyte", "megabyte", "gigabyte", "terabyte"]
+theory = ["turing machine", "automaton", "computability", "boolean", "logic gate", "lambda calculus", "halting problem", "np-complete", "finite state machine"]
+
+[programming]
+concept = ["recursion", "loop", "inheritance", "polymorphism", "encapsulation", "closure", "callback", "asynchronous", "exception", "pointer", "iterator", "generator", "lambda", "immutable", "syntax"]
+paradigm = ["object oriented", "object-oriented", "functional programming", "procedural", "declarative", "imperative", "event-driven", "microservices"]
+practice = ["debugging", "debug", "bug", "refactoring", "unit test", "code review", "deployment", "ci/cd", "pull request", "merge conflict", "commit", "open source"]
+tool = ["git", "github", "docker", "kubernetes", "compiler", "interpreter", "debugger", "package manager", "pip", "npm", "termux", "vim", "nano", "ide"]
+web = ["frontend", "front end", "backend", "back end", "api", "rest api", "endpoint", "json", "yaml", "webhook", "http request", "browser", "website", "web app", "framework", "react", "django", "flask", "vue", "angular", "svelte", "tailwind"]
+language = ["python", "javascript", "typescript", "java", "kotlin", "scala", "ruby", "php", "perl", "lua", "rust", "golang", "dart", "haskell", "elixir", "erlang", "clojure", "julia", "csharp", "c#", "c++", "objective-c", "bash", "powershell", "sql", "html", "css", "assembly", "fortran", "cobol", "matlab", "zig"]

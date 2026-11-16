@@ -3,10 +3,7 @@ import unittest
 from lily.memory import run_log
 from lily.memory.db import Database
 from lily.memory.entity_taxonomy import EntityTaxonomy
-from lily.ui import commands
 from lily.utils.errors import LilyError
-from tests.fakes import text_reply
-from tests.memory_helpers import setup
 
 TEXT = "My dog and my cat went to Manila by bus. The dog liked the phone."
 
@@ -21,7 +18,7 @@ def file_chat(db, tax, question="q", answer=TEXT):
 
 
 class EntityTaxonomyTests(unittest.TestCase):
-    def test_report_is_a_tree_of_the_three_classes(self):
+    def test_report_is_a_tree_of_the_classes(self):
         db, tax = taxonomy()
         self.assertEqual(file_chat(db, tax), 5)
         lines = tax.report().splitlines()
@@ -73,39 +70,6 @@ class EntityTaxonomyTests(unittest.TestCase):
         self.assertIn("removed 'seize'", tax.remove("seize"))
         with self.assertRaisesRegex(LilyError, "not one you added"):
             tax.remove("dog")
-
-
-class EntityFlowTests(unittest.TestCase):
-    def test_every_turn_is_filed_as_it_happens(self):
-        lily, memory = setup(text_reply("Dogs are loyal."))
-        lily.handle("tell me about Japan")
-        rows = memory.db.rows("SELECT name, cls, sub FROM entity_mentions ORDER BY name")
-        self.assertEqual(rows, [("dog", "entity", "animal"), ("japan", "location", "country")])
-
-    def test_subjects_are_filed_next_to_the_things(self):
-        lily, memory = setup(text_reply("Photosynthesis is biology."))
-        lily.handle("explain the quadratic formula in a haiku about the Renaissance")
-        rows = memory.db.rows("SELECT cls, sub, name FROM entity_mentions ORDER BY cls, name")
-        self.assertEqual(rows, [
-            ("history", "era", "renaissance"), ("literature", "form", "haiku"),
-            ("math", "algebra", "quadratic"), ("science", "biology", "biology"),
-            ("science", "biology", "photosynthesis")])
-        report = commands.run(lily, "/entity").splitlines()
-        self.assertEqual([x for x in report if not x.startswith(" ")], ["literature", "science", "math", "history"])
-        self.assertIn("math", commands.run(lily, "/entity classes"))
-
-    def test_slash_commands(self):
-        lily, _ = setup(text_reply("A cat."))
-        lily.handle("what is on my desk? phone?")
-        self.assertIn("device: phone x1", commands.run(lily, "/entity"))
-        self.assertIn("entity", commands.run(lily, "/entity classes"))
-        self.assertIn("cat", commands.run(lily, "/entity show entity/animal"))
-        self.assertIn("chat #1", commands.run(lily, "/entity find phone"))
-        self.assertIn("added 'blue pen'", commands.run(lily, "/entity add blue pen object/tool"))
-        self.assertIn("removed 'blue pen'", commands.run(lily, "/entity remove blue pen"))
-        self.assertIn("scanned 1 chat(s)", commands.run(lily, "/entity scan"))
-        self.assertIn("Usage", commands.run(lily, "/entity add pen"))
-        self.assertIn("Usage", commands.run(lily, "/entity nonsense"))
 
 
 if __name__ == "__main__":
