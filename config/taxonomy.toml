@@ -1,9 +1,10 @@
 # The universal data taxonomy. It only organizes and filters what Lily has stored:
 # labels point at records (chats, notes...) and never change them.
 #
-# A record can carry several labels (one chat can be study/history AND geography/city).
+# A record can carry several labels (one chat can be study/history AND geography/settlement).
 # A record with no label is "unclassified". A label under "unknown/..." means
 # "looked at, does not fit anywhere yet". Both are normal and nothing is lost.
+# Overlap is fine: when a record fits two branches, give it both labels.
 #
 # Paths are lowercase words joined by "/": study/history/medieval (up to 6 levels).
 
@@ -14,11 +15,81 @@ geography = "Places and spatial information"
 nature = "Natural systems and phenomena"
 study = "Knowledge, disciplines, discoveries, history, concepts and research"
 
-# Subcategories start empty on purpose. Grow the tree any time, with no code change:
-#   inside Lily:  /taxonomy add study/history "the past, and how we know it"
-#   or here:      "study/history" = "the past, and how we know it"
-# The bridge below also adds the paths it needs the first time a chat uses them.
+# Broad second-level branches. Every branch needs a definition that no other branch shares.
+# Go deeper any time, with no code change:
+#   inside Lily:  /taxonomy add study/history/medieval "the middle ages"
+#   or here:      "study/history/medieval" = "the middle ages"
 [sub]
+# Entity: what exists or can be identified
+"entity/living" = "Living things that are not a person, animal, plant or microorganism, such as fungi"
+"entity/non-living" = "Non-living things that are neither made objects nor materials, such as stars, clouds and single rocks"
+"entity/person" = "Individual people and their roles, such as a mother, a teacher or a king"
+"entity/animal" = "Animals of any kind, wild or domestic"
+"entity/plant" = "Plants of any kind, from grass to trees"
+"entity/microorganism" = "Living things too small to see unaided, such as bacteria, protists and viruses"
+"entity/object" = "Made or discrete things, such as devices, vehicles, tools, food and clothing"
+"entity/material" = "What things are made of, such as metal, wood, plastic, cloth and stone"
+"entity/organization" = "Formally structured bodies, such as companies, schools, governments and teams"
+"entity/group" = "Informal collectives of people or things, such as a family, a crowd, a community or a flock"
+
+# Geography: where something exists
+"geography/continent" = "The continents and other very large world regions, such as Asia, Africa and Antarctica"
+"geography/country-territory" = "Sovereign countries and dependent territories"
+"geography/administrative-region" = "Parts of a country with their own government or purpose: provinces, states, districts and counties"
+"geography/settlement" = "Places where people live together: cities, towns, villages and neighborhoods"
+"geography/landform" = "Natural shapes of land: mountains, volcanoes, valleys, islands, deserts and caves"
+"geography/water-body" = "Bodies and courses of water: oceans, seas, rivers, lakes and bays"
+"geography/geographic-feature" = "Named features that mix or sit between land and water, such as coastlines, deltas, watersheds and mountain passes"
+"geography/location" = "Specific places, venues and addresses, such as a house, an office, a park or an airport"
+"geography/boundary" = "Borders and dividing lines, such as national borders, frontiers and jurisdiction limits"
+"geography/spatial-relationship" = "How places relate in space: distance, direction, nearness and containment"
+
+# Nature: natural systems, conditions and processes
+"nature/ecosystem" = "A community of living things together with its environment, such as a forest or a coral reef"
+"nature/habitat" = "The kind of place where a species lives, such as a wetland, a burrow or a canopy"
+"nature/climate" = "Long-term weather patterns of a region, and how they change"
+"nature/weather" = "Short-term atmospheric conditions such as rain, wind, storms and heat"
+"nature/natural-phenomenon" = "Observable natural events, such as eclipses, auroras, earthquakes and lightning"
+"nature/natural-process" = "Continuing natural change, such as erosion, the water cycle, photosynthesis and decay"
+"nature/geological-system" = "The solid-Earth systems: plate tectonics, the rock cycle and volcanic activity"
+"nature/natural-resource" = "Materials and energy that nature supplies, such as water, minerals, timber and wind"
+"nature/environmental-condition" = "The state and health of an environment, such as air quality, pollution and soil condition"
+"nature/biodiversity" = "The variety of life and its protection, including species richness and extinction"
+
+# Study: areas of human knowledge and understanding
+"study/history" = "The past and how we know it: eras, events, civilizations and institutions"
+"study/science" = "Systematic study of the natural world: physics, chemistry, biology, astronomy and earth science"
+"study/math" = "Mathematics: numbers, algebra, geometry, calculus, statistics and logic"
+"study/philosophy" = "Questions of existence, knowledge, reason, ethics and meaning"
+"study/culture" = "Shared ways of living: customs, traditions, festivals and identity"
+"study/language" = "Human languages and linguistics: grammar, vocabulary, writing systems and translation"
+"study/religion-belief" = "Religions, spiritual traditions and belief systems"
+"study/arts-literature" = "Creative and expressive works: visual art, music, theater, film and literature"
+"study/social-studies" = "How people and societies live and interact: sociology, anthropology, psychology and communities"
+"study/political-studies" = "Government, power, law, policy and international relations"
+"study/economics" = "Production, trade, money, markets, work and resources"
+"study/medicine" = "Health, illness, treatment and the body: clinical practice and public health"
+"study/technology" = "Applied tools and methods, including engineering, computing and programming"
+"study/education" = "Teaching and learning: schools, methods, curricula and skills"
+"study/research-discovery" = "How new knowledge is made: research methods, studies, experiments, inventions and discoveries"
+
+# Older ids that now mean the same thing as a new branch. Nothing stored is rewritten:
+# records under the old id are found under the new one, and new labels use the new one.
+[alias]
+"nature/animal" = "entity/animal"
+"nature/plant" = "entity/plant"
+"geography/country" = "geography/country-territory"
+"geography/city" = "geography/settlement"
+"geography/region" = "geography/administrative-region"
+"geography/water" = "geography/water-body"
+"geography/place" = "geography/location"
+
+# Older branches that keep their id and sit inside a broader branch: they are drawn under it
+# and their records count toward it.
+[inside]
+"study/literature" = "study/arts-literature"
+"study/computing" = "study/technology"
+"study/programming" = "study/technology"
 
 # How the older word-list taxonomy (/entity) and code blocks (/code) feed this one.
 # "class" sends every subclass below it (entity/person -> entity/person);
@@ -26,10 +97,14 @@ study = "Knowledge, disciplines, discoveries, history, concepts and research"
 # Anything not listed lands in unknown/<class>. "code" is any chat that has a code block.
 [legacy]
 entity = "entity"
-"entity/animal" = "nature/animal"
-"entity/plant" = "nature/plant"
 object = "entity/object"
 location = "geography"
+"location/country" = "geography/country-territory"
+"location/city" = "geography/settlement"
+"location/region" = "geography/administrative-region"
+"location/water" = "geography/water-body"
+"location/landform" = "geography/landform"
+"location/place" = "geography/location"
 literature = "study/literature"
 science = "study/science"
 math = "study/math"

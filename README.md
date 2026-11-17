@@ -295,20 +295,41 @@ The four top-level categories (`config/taxonomy.toml`):
 - **nature**: natural systems and phenomena
 - **study**: knowledge, disciplines, discoveries, history, concepts and research
 
-Subcategories start empty on purpose. Paths are lowercase words joined by `/`,
-up to 6 levels, for example `study/history/medieval`.
+Each has broad second-level branches (below). Deeper levels start empty on
+purpose and grow on demand. Paths are lowercase words joined by `/`, up to 6
+levels, for example `study/history/medieval`.
+
+| Top level | Branches (every one has a definition in `config/taxonomy.toml`) |
+|---|---|
+| **entity** (what exists or can be identified) | living, non-living, person, animal, plant, microorganism, object, material, organization, group |
+| **geography** (where, and how places relate) | continent, country-territory, administrative-region, settlement, landform, water-body, geographic-feature, location, boundary, spatial-relationship |
+| **nature** (natural systems and processes) | ecosystem, habitat, climate, weather, natural-phenomenon, natural-process, geological-system, natural-resource, environmental-condition, biodiversity |
+| **study** (human knowledge) | history, science, math, philosophy, culture, language, religion-belief, arts-literature, social-studies, political-studies, economics, medicine, technology, education, research-discovery |
+
+Branches may overlap, so give a record every label that fits. Do not force a
+record into a branch that does not fit: leave it unclassified, or use `unknown/...`.
 
 - A record can have **several labels** (one chat can be `study/history` and
-  `geography/city`).
+  `geography/settlement`).
 - A record with no label is **unclassified**. A label under `unknown/...` means
   "looked at, does not fit yet". Both are normal and need no setup.
 - Any kind of record can be labelled (`run`, `note`, or a new word of your own),
   so adding a new kind needs no code change.
 - The older `/entity` and `/code` filing feeds this tree automatically through
-  the `[legacy]` mapping in `config/taxonomy.toml` (for example `location`
-  becomes `geography`, `entity/animal` becomes `nature/animal`). Your own
+  the `[legacy]` mapping in `config/taxonomy.toml` (for example
+  `location/city` becomes `geography/settlement`). Your own
   labels always win over automatic ones on the same path.
 - Notes (RAG) can be searched inside one category.
+- **Older ids are kept.** Nothing stored is rewritten. Two tables in the config
+  record how earlier ids relate to the branches above:
+  - `[alias]`: the same thing under a new id (`nature/animal` is now
+    `entity/animal`, `geography/city` is now `geography/settlement`, and so on).
+    Filtering by the new id also finds records filed under the old one, and new
+    labels use the new id.
+  - `[inside]`: an older branch that keeps its id but sits inside a broader one
+    (`study/computing` and `study/programming` inside `study/technology`,
+    `study/literature` inside `study/arts-literature`). It is drawn under that
+    branch and counts toward it.
 
 Commands:
 
@@ -358,7 +379,7 @@ lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_s
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
 lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding and entity taxonomies
-lily/memory/taxonomy/  universal taxonomy: paths, tree, label store, legacy bridge, report, service
+lily/memory/taxonomy/  universal taxonomy: paths, records, tree (branches, older ids), label store, legacy bridge, report, service
 lily/ui/           terminal loop, rich renderer, slash commands (commands_*.py: one file per command group)
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .

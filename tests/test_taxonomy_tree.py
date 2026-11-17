@@ -36,13 +36,13 @@ class PathTests(unittest.TestCase):
 
 class ConfigTests(unittest.TestCase):
     def test_the_shipped_file_has_the_four_top_level_categories(self):
-        roots, subs, legacy = load_config()
+        roots, subs, legacy, alias, inside = load_config()
         self.assertEqual(list(roots), ["entity", "geography", "nature", "study"])
         self.assertTrue(all(path.split("/")[0] in roots for path in legacy.values()))
-        self.assertEqual(Tree((roots, subs, legacy)).roots, ("entity", "geography", "nature", "study"))
+        self.assertEqual(Tree((roots, subs, legacy, alias, inside)).roots, ("entity", "geography", "nature", "study"))
 
     def test_a_missing_file_is_an_empty_taxonomy(self):
-        self.assertEqual(load_config(Path("/nonexistent/t.toml")), ({}, {}, {}))
+        self.assertEqual(load_config(Path("/nonexistent/t.toml")), ({}, {}, {}, {}, {}))
 
     def test_bad_files_are_config_errors(self):
         for text in ("[roots\n", '[roots]\n"a/b" = "x"\n', '[roots]\nunknown = "x"\n', '[sub]\n"" = "x"\n'):

@@ -31,7 +31,7 @@ class MemoryFlowTests(unittest.TestCase):
     def test_every_turn_is_labelled_automatically_and_the_chat_is_untouched(self):
         lily, memory = setup(text_reply(CODE_REPLY))
         lily.handle("tell me about my dog in Manila")
-        self.assertEqual(labels(memory), ["geography/city", "nature/animal", "study/programming"])
+        self.assertEqual(labels(memory), ["entity/animal", "geography/settlement", "study/programming"])
         before = memory.db.rows("SELECT * FROM runs")
         run(lily, "/taxonomy scan")
         run(lily, "/taxonomy unlabel run all 1")
@@ -49,28 +49,28 @@ class MemoryFlowTests(unittest.TestCase):
     def test_your_labels_survive_a_rescan_and_do_not_duplicate_the_automatic_ones(self):
         lily, memory = setup(text_reply("Dogs bark."))
         lily.handle("hi")
-        run(lily, "/taxonomy add study/history the past")
         run(lily, "/taxonomy label run study/history 1")
-        run(lily, "/taxonomy label run nature/animal 1")   # same path the bridge made
+        run(lily, "/taxonomy label run nature/animal 1")   # the older id: it files under entity/animal
         run(lily, "/taxonomy scan")
         run(lily, "/taxonomy scan")
-        self.assertEqual(labels(memory), ["nature/animal", "study/history"])
-        self.assertIn("nature/animal  (user)", run(lily, "/taxonomy of run 1"))
+        self.assertEqual(labels(memory), ["entity/animal", "study/history"])
+        self.assertIn("entity/animal  (user)", run(lily, "/taxonomy of run 1"))
 
 
 class CommandTests(unittest.TestCase):
     def test_build_label_and_filter_from_the_command_line(self):
         lily, _ = setup(text_reply("Dogs bark."))
         lily.handle("hi")
-        self.assertEqual(run(lily, "/taxonomy add study/history the past"), "added study/history")
-        run(lily, "/taxonomy label run study/history 1")
+        self.assertEqual(run(lily, "/taxonomy add study/history/medieval the middle ages"),
+                         "added study/history/medieval")
+        run(lily, "/taxonomy label run study/history/medieval 1")
         self.assertEqual(run(lily, "/taxonomy show study"), "run 1")
-        self.assertEqual(run(lily, "/taxonomy show all study nature"), "run 1")
+        self.assertEqual(run(lily, "/taxonomy show all study entity"), "run 1")
         self.assertEqual(run(lily, "/taxonomy show geography"), "nothing filed there")
         tree = run(lily, "/taxonomy")
         self.assertIn("study  1 record(s)  - Knowledge", tree)
-        self.assertIn("  history  1 record(s)  - the past", tree)
-        self.assertIn("nature  1 record(s)", tree)
+        self.assertIn("    medieval  1 record(s)  - the middle ages", tree)
+        self.assertIn("entity  1 record(s)", tree)
 
     def test_mistakes_are_explained_not_raised_as_crashes(self):
         lily, _ = setup(text_reply("ok"))

@@ -41,10 +41,25 @@ def labels_of(db, kind, ref):
                    (kind, ref))
 
 
-def refs(db, path, kind=None):
+NO_SPAN = ((), (), ())   # what Tree.span() returns when no older ids are involved
+
+
+def _within(path, span):
+    """SQL for 'at or below path', adjusted for older ids (see Tree.span)."""
+    also, skip, _ = span
+    sql, params = "(path = ? OR path LIKE ?)", [path, path + "/%"]
+    for old in skip:
+        sql, params = sql + " AND NOT (path = ? OR path LIKE ?)", [*params, old, old + "/%"]
+    sql = f"({sql})"
+    for old in also:
+        sql, params = sql + " OR (path = ? OR path LIKE ?)", [*params, old, old + "/%"]
+    return f"({sql})", params
+
+
+def refs(db, path, kind=None, span=NO_SPAN):
     """[(kind, ref)] of the records labelled at `path` or anywhere below it."""
-    sql = "SELECT DISTINCT kind, ref FROM taxonomy_labels WHERE (path = ? OR path LIKE ?)"
-    params = [path, path + "/%"]
+    where, params = _within(path, span)
+    sql = f"SELECT DISTINCT kind, ref FROM taxonomy_labels WHERE {where}"
     if kind:
         sql, params = sql + " AND kind = ?", [*params, kind]
     return db.rows(sql + " ORDER BY kind, ref", params)
@@ -54,11 +69,12 @@ def labelled_refs(db, kind):
     return {ref for (ref,) in db.rows("SELECT DISTINCT ref FROM taxonomy_labels WHERE kind = ?", (kind,))}
 
 
-def count(db, path):
-    """Records at or below `path`, and records labelled exactly at it."""
-    deep = db.rows("SELECT count(DISTINCT kind || ':' || ref) FROM taxonomy_labels "
-                   "WHERE path = ? OR path LIKE ?", (path, path + "/%"))[0][0]
-    here = db.rows("SELECT count(*) FROM taxonomy_labels WHERE path = ?", (path,))[0][0]
+def count(db, path, span=NO_SPAN):
+    """Records at or below `path`, and labels exactly at it (or at an older id of it)."""
+    where, params = _within(path, span)
+    deep = db.rows(f"SELECT count(DISTINCT kind || ':' || ref) FROM taxonomy_labels WHERE {where}", params)[0][0]
+    exact = [path, *span[2]]
+    here = db.rows(f"SELECT count(*) FROM taxonomy_labels WHERE path IN ({','.join('?' * len(exact))})", exact)[0][0]
     return deep, here
 
 
