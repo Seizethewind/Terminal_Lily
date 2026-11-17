@@ -1,0 +1,33 @@
+# Lily herself: two routers, workload tiers, roles and limits.
+# Keys never go in this file: key_env names the variable in .env.
+
+[lily]      # her own router: personality, taking over failed tasks, final say
+url = "https://vansrouter-36le.onrender.com/v1"
+key_env = "SELF_API_KEY"
+
+[workers]   # the background workers' router; Lily's router is its fallback
+url = "https://freellmapi-eqcl.onrender.com/v1"
+key_env = "LILY_API_KEY"
+
+[tiers]     # workload tier -> model string sent to the router
+light = "auto:fast"
+normal = "auto"
+heavy = "auto:smart"
+
+[roles]     # role -> usual tier (any role name works; "default" is the fallback)
+default = "normal"
+researcher = "normal"
+coder = "heavy"
+summarizer = "light"
+
+[limits]
+max_workers = 3      # workers at once (busy = one tier lighter)
+worker_steps = 6     # think/act steps per worker
+approval_wait = 120  # seconds a worker waits for your answer, then it counts as no
+breaker_fails = 3    # failures in a row before a router is skipped for a while
+breaker_pause = 60   # seconds a failing router is skipped
+recent_turns = 6     # turns from earlier sessions Lily is reminded of
+timeout = 60         # seconds to wait for a router
+
+[personality]
+text = ""            # leave empty for the built-in character
