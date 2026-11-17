@@ -13,7 +13,7 @@ SECOND_LEVEL = {
     "nature": "ecosystem habitat climate weather natural-phenomenon natural-process geological-system "
               "natural-resource environmental-condition biodiversity",
     "study": "history science math philosophy culture language religion-belief arts-literature social-studies "
-             "political-studies economics medicine technology education research-discovery",
+             "political-studies economics medicine technology education research-discovery entity geography nature",
 }
 ROOTS = {"entity": "e", "geography": "g", "nature": "n", "study": "s"}
 SUBS = {"entity/animal": "a", "study/technology": "t", "study/arts-literature": "l"}
