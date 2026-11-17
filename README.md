@@ -295,9 +295,11 @@ The four top-level categories (`config/taxonomy.toml`):
 - **nature**: natural systems and phenomena
 - **study**: knowledge, disciplines, discoveries, history, concepts and research
 
-Each has broad second-level branches (below). Deeper levels start empty on
-purpose and grow on demand. Paths are lowercase words joined by `/`, up to 6
-levels, for example `study/history/medieval`.
+Each has broad second-level branches (below). **Study** also has a third level
+(the main areas inside each branch, listed after the table). Entity, geography
+and nature stop at the second level for now, and every level grows on demand.
+Paths are lowercase words joined by `/`, up to 6 levels, for example
+`study/history/medieval`.
 
 | Top level | Branches (every one has a definition in `config/taxonomy.toml`) |
 |---|---|
@@ -305,6 +307,30 @@ levels, for example `study/history/medieval`.
 | **geography** (where, and how places relate) | continent, country-territory, administrative-region, settlement, landform, water-body, geographic-feature, location, boundary, spatial-relationship |
 | **nature** (natural systems and processes) | ecosystem, habitat, climate, weather, natural-phenomenon, natural-process, geological-system, natural-resource, environmental-condition, biodiversity |
 | **study** (human knowledge) | history, science, math, philosophy, culture, language, religion-belief, arts-literature, social-studies, political-studies, economics, medicine, technology, education, research-discovery |
+
+Study areas (third level, all in `config/taxonomy.toml` with definitions):
+
+| Branch | Areas |
+|---|---|
+| **history** | era, event, civilization, institution, historiography, archaeology |
+| **science** | physics, chemistry, biology, astronomy, earth, environmental-science |
+| **math** | arithmetic, algebra, geometry, trigonometry, calculus, statistics, linear-algebra, logic, discrete-math |
+| **philosophy** | metaphysics, epistemology, ethics, aesthetics, philosophy-of-mind, philosophical-tradition |
+| **culture** | tradition, festival, cuisine, folklore, popular-culture, cultural-heritage |
+| **language** | linguistics, grammar, vocabulary, writing-system, translation, language-learning |
+| **religion-belief** | world-religion, scripture, ritual-practice, theology, spirituality, secular-belief |
+| **arts-literature** | visual-art, music, performing-art, film-media, architecture, craft, art-criticism |
+| **social-studies** | sociology, anthropology, psychology, social-issue, community, demography |
+| **political-studies** | government, political-ideology, law, public-policy, international-relations, election |
+| **economics** | microeconomics, macroeconomics, finance, trade, labor, business-management |
+| **medicine** | anatomy-physiology, disease, treatment, pharmacology, public-health, mental-health, nutrition |
+| **technology** | engineering, electronics, energy, manufacturing, transportation, communication, biotechnology, robotics-automation |
+| **education** | teaching-method, curriculum, learning-theory, study-skill, assessment, school-system |
+| **research-discovery** | research-method, experiment, discovery, invention, theory, publication |
+
+`literature`, `computing` and `programming` keep their own ids and sit inside
+arts-literature and technology (see "Older ids are kept"); their areas
+(for example `study/computing/algorithm`) are made the first time a chat uses them.
 
 Branches may overlap, so give a record every label that fits. Do not force a
 record into a branch that does not fit: leave it unclassified, or use `unknown/...`.
