@@ -7,6 +7,7 @@ from lily.memory.taxonomy.tree import Tree, load_config
 
 BRANCHES = ("history science math philosophy culture language religion-belief arts-literature social-studies "
             "political-studies economics medicine technology education research-discovery").split()
+THINGS = "entity geography nature".split()   # knowledge about things, places and nature
 KEPT = ("science/physics science/chemistry science/biology science/astronomy science/earth math/arithmetic "
         "math/algebra math/geometry math/trigonometry math/calculus math/statistics math/linear-algebra "
         "history/era history/event history/civilization history/institution").split()
@@ -33,7 +34,7 @@ class StudyAreaTests(unittest.TestCase):
 
     def test_areas_stay_one_level_under_their_branch(self):
         areas = [path for path in self.tree.nodes if path.count("/") == 2]
-        self.assertTrue(all(path.split("/")[1] in BRANCHES for path in areas))
+        self.assertTrue(all(path.split("/")[1] in BRANCHES + THINGS for path in areas))
         self.assertGreaterEqual(len(areas), 90)
 
     def test_every_area_has_topics_under_it_and_nothing_hangs_loose(self):
@@ -53,6 +54,12 @@ class StudyAreaTests(unittest.TestCase):
         tax.classify("run", "1", "study/science/physics/optics")
         for path in ("study", "study/science", "study/science/physics", "study/science/physics/optics"):
             self.assertEqual(tax.refs([path]), [("run", "1")], path)
+
+    def test_entity_geography_and_nature_have_study_areas_and_stop_there(self):
+        for branch in THINGS:
+            areas = self.tree.children(f"study/{branch}")
+            self.assertGreaterEqual(len(areas), 10, branch)
+            self.assertFalse(any(self.tree.children(area) for area in areas), branch)
 
 
 if __name__ == "__main__":
