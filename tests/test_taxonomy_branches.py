@@ -47,8 +47,9 @@ class ShippedConfigTests(unittest.TestCase):
         self.assertTrue(all(len(text) > 20 for text in texts))
         self.assertEqual(len(texts), len(set(texts)))
 
-    def test_nothing_deeper_than_the_second_level_is_pre_made(self):
-        self.assertTrue(all(path.count("/") <= 1 for path in self.tree.nodes))
+    def test_only_study_has_a_third_level_and_nothing_goes_deeper(self):
+        self.assertTrue(all(path.count("/") <= 2 for path in self.tree.nodes))
+        self.assertTrue(all(path.startswith("study/") for path in self.tree.nodes if path.count("/") == 2))
 
     def test_the_bridge_and_older_ids_point_at_real_places(self):
         for target in self.tree.legacy.values():
