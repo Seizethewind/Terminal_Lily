@@ -296,8 +296,9 @@ The four top-level categories (`config/taxonomy.toml`):
 - **study**: knowledge, disciplines, discoveries, history, concepts and research
 
 Each has broad second-level branches (below). **Study** also has a third level
-(the main areas inside each branch, listed after the table). Entity, geography
-and nature stop at the second level for now, and every level grows on demand.
+(the main areas inside each branch, listed after the table) and a fourth level
+(the main topics inside each area). Entity, geography and nature stop at the
+second level for now, and every level grows on demand.
 Paths are lowercase words joined by `/`, up to 6 levels, for example
 `study/history/medieval`.
 
@@ -327,6 +328,15 @@ Study areas (third level, all in `config/taxonomy.toml` with definitions):
 | **technology** | engineering, electronics, energy, manufacturing, transportation, communication, biotechnology, robotics-automation |
 | **education** | teaching-method, curriculum, learning-theory, study-skill, assessment, school-system |
 | **research-discovery** | research-method, experiment, discovery, invention, theory, publication |
+
+Study topics (fourth level): every area above has 3 to 8 topics, about 500 in
+all, each with its own definition in `config/taxonomy.toml`. For example
+`study/science/physics` holds mechanics, thermodynamics, electromagnetism,
+optics, quantum-physics, relativity and nuclear-physics, and
+`study/religion-belief/world-religion` holds christianity, islam, hinduism,
+buddhism, judaism, sikhism, folk-indigenous-religion and new-religious-movement.
+Run `/taxonomy show study/science/physics` for one area. Nothing goes deeper
+than the fourth level by default.
 
 `literature`, `computing` and `programming` keep their own ids and sit inside
 arts-literature and technology (see "Older ids are kept"); their areas
