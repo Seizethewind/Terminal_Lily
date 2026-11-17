@@ -13,6 +13,7 @@ from lily.utils.logger import get_logger
 
 log = get_logger("self")
 CLIP = 300
+HEADER = "YOUR MEMORY OF THE USER (already loaded, nothing to look up):"
 
 
 def _cut(text):
@@ -48,7 +49,7 @@ class SelfOrchestrator:
         lines = []
         facts = self.memory.facts()
         if facts:
-            lines += ["What you know about the user:"] + [f"- {fact}" for fact in facts]
+            lines += [HEADER] + [f"- {fact}" for fact in facts]
         if len(state.messages) < 10:   # a fresh session: remind her how the last one ended
             for user, answer in self.memory.earlier(self.cfg.limits["recent_turns"]):
                 lines.append(f"Earlier chat, user: {_cut(user)} | you: {_cut(answer)}")

@@ -62,7 +62,7 @@ class ToolsOrchestrator:
             known = ", ".join(self.registry.names())
             raise ToolError(f"no tool named '{call['name']}'. Available: {known}")
         args = call.get("args") or {}
-        if not self.permissions.allow(tool, args):
+        if not self.permissions.allow(tool, args, state):
             raise ToolError(f"the user declined to run {tool.name}")
         try:
             output = tool.execute(args)
