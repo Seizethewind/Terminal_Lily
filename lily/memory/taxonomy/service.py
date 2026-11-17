@@ -1,13 +1,9 @@
 """The universal data taxonomy: label any stored record with one or more categories."""
-import re
-
-from lily.memory.taxonomy import legacy, report, store
+from lily.memory.taxonomy import legacy, records, report, store
 from lily.memory.taxonomy.paths import ancestors, clean
 from lily.memory.taxonomy.tree import Tree, load_config
 from lily.utils.errors import LilyError
 
-KIND = re.compile(r"^[a-z][a-z0-9_-]{0,19}$")
-MAX_REF = 300
 PREVIEW = 60   # characters of a chat shown when listing unclassified runs
 
 
@@ -58,7 +54,7 @@ class Taxonomy:
 
     def classify(self, kind, ref, path, source="user", create=False):
         """Add one category to a record. A record can have many. `create` registers missing subcategories."""
-        kind, ref, path = self._kind(kind), self._ref(ref), clean(path)
+        kind, ref, path = records.kind(kind), records.ref(ref), self.tree.resolve(clean(path))
         if not self.tree.has(path):
             if not create:
                 raise LilyError(f"'{path}' is not in the taxonomy yet. Add it first: /taxonomy add {path}")
@@ -67,18 +63,21 @@ class Taxonomy:
         return f"{kind} {ref}: {path}"
 
     def unclassify(self, kind, ref, path=None):
-        removed = store.unlabel(self.db, self._kind(kind), self._ref(ref), clean(path) if path else None)
+        kind, ref = records.kind(kind), records.ref(ref)
+        names = self.tree.names(clean(path)) if path else [None]   # a branch and its older ids
+        removed = sum(store.unlabel(self.db, kind, ref, name) for name in names)
         return f"removed {removed} label(s)"
 
     def of(self, kind, ref):
-        rows = store.labels_of(self.db, self._kind(kind), self._ref(ref))
+        rows = store.labels_of(self.db, records.kind(kind), records.ref(ref))
         return "\n".join(f"{path}  ({source})" for path, source in rows) or "no labels: it is unclassified"
 
     def refs(self, paths, kind=None, mode="any"):
         """[(kind, ref)] labelled at or below the paths: any of them, or all of them."""
         if not paths:
             raise LilyError("give at least one category path")
-        found = [set(store.refs(self.db, clean(path), kind)) for path in paths]
+        paths = [self.tree.resolve(clean(path)) for path in paths]
+        found = [set(store.refs(self.db, path, kind, self.tree.span(path))) for path in paths]
         return sorted(set.intersection(*found) if mode == "all" else set.union(*found))
 
     def unclassified(self, kind):
@@ -99,17 +98,3 @@ class Taxonomy:
 
     def report(self):
         return report.render(self.tree, self.db, {kind: self.unclassified(kind) for kind in self.kinds})
-
-    @staticmethod
-    def _kind(kind):
-        kind = str(kind).strip().lower()
-        if not KIND.match(kind):
-            raise LilyError(f"'{kind}' is not a kind of record (use a short lowercase word, like run or note)")
-        return kind
-
-    @staticmethod
-    def _ref(ref):
-        ref = str(ref).strip()
-        if not ref or len(ref) > MAX_REF:
-            raise LilyError(f"a record reference must be 1 to {MAX_REF} characters")
-        return ref
