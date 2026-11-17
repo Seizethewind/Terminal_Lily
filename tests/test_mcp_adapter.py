@@ -75,8 +75,11 @@ class ConfigTests(unittest.TestCase):
         with self.assertRaises(ConfigError):
             load_servers(self.write('[[servers]]\nname = "a"\n'))
 
-    def test_the_shipped_config_has_the_lilyai_server_switched_off(self):
-        self.assertEqual(load_servers(), [])
+    def test_the_shipped_config_loads_and_only_describes_the_lilyai_server(self):
+        # It may be switched on or off (the user decides); the key is never stored in it.
+        for server in load_servers():
+            self.assertEqual((server["name"], server["auth_env"]), ("lilyai", "MCP_API_KEYS"))
+            self.assertTrue(server["url"].startswith("http"))
 
 
 if __name__ == "__main__":
