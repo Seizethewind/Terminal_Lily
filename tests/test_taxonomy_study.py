@@ -36,6 +36,24 @@ class StudyAreaTests(unittest.TestCase):
         self.assertTrue(all(path.split("/")[1] in BRANCHES for path in areas))
         self.assertGreaterEqual(len(areas), 90)
 
+    def test_every_area_has_topics_under_it_and_nothing_hangs_loose(self):
+        areas = [path for path in self.tree.nodes if path.count("/") == 2 and self.tree.children(path)]
+        topics = [path for path in self.tree.nodes if path.count("/") == 3]
+        self.assertGreaterEqual(len(areas), 97)
+        self.assertGreaterEqual(len(topics), 400)
+        for path in topics:
+            self.assertIn(path.rsplit("/", 1)[0], self.tree.nodes)
+        for path in self.tree.nodes:
+            if path.count("/") == 2 and path.split("/")[1] in BRANCHES:
+                self.assertTrue(self.tree.children(path), path)
+
+    def test_a_record_filed_on_a_topic_is_found_from_every_level_above(self):
+        db = Database(":memory:")
+        tax = Taxonomy(lambda: db)
+        tax.classify("run", "1", "study/science/physics/optics")
+        for path in ("study", "study/science", "study/science/physics", "study/science/physics/optics"):
+            self.assertEqual(tax.refs([path]), [("run", "1")], path)
+
 
 if __name__ == "__main__":
     unittest.main()
