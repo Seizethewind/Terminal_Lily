@@ -310,14 +310,14 @@ Branches may overlap, so give a record every label that fits. Do not force a
 record into a branch that does not fit: leave it unclassified, or use `unknown/...`.
 
 - A record can have **several labels** (one chat can be `study/history` and
-  `geography/city`).
+  `geography/settlement`).
 - A record with no label is **unclassified**. A label under `unknown/...` means
   "looked at, does not fit yet". Both are normal and need no setup.
 - Any kind of record can be labelled (`run`, `note`, or a new word of your own),
   so adding a new kind needs no code change.
 - The older `/entity` and `/code` filing feeds this tree automatically through
-  the `[legacy]` mapping in `config/taxonomy.toml` (for example `location`
-  becomes `geography`, `entity/animal` becomes `nature/animal`). Your own
+  the `[legacy]` mapping in `config/taxonomy.toml` (for example
+  `location/city` becomes `geography/settlement`). Your own
   labels always win over automatic ones on the same path.
 - Notes (RAG) can be searched inside one category.
 - **Older ids are kept.** Nothing stored is rewritten. Two tables in the config
