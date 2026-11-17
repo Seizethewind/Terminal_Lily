@@ -3,6 +3,7 @@ from lily.memory import export_dataset, feedback, history, lessons, profile_hint
 from lily.memory.code_taxonomy import CodeTaxonomy
 from lily.memory.db import Database
 from lily.memory.entity_taxonomy import EntityTaxonomy
+from lily.memory.taxonomy.service import Taxonomy
 from lily.utils.errors import LilyError
 
 DB_NAME = "lily.db"
@@ -18,6 +19,7 @@ class MemoryOrchestrator:
         self.last_run_id = None
         self.code = CodeTaxonomy(lambda: self.db)   # the coding taxonomy
         self.entities = EntityTaxonomy(lambda: self.db)   # entity / location / object
+        self.taxonomy = Taxonomy(lambda: self.db, self._note_sources)   # universal data taxonomy
 
     @property
     def db(self):
@@ -25,6 +27,11 @@ class MemoryOrchestrator:
         if self._db is None:
             self._db = Database(self.lily.settings.data_dir / DB_NAME)
         return self._db
+
+    def _note_sources(self):
+        """The names of every note RAG holds (empty if RAG is not installed)."""
+        rag = self.lily.router.get("rag")
+        return [source for source, _ in rag.store.sources()] if rag is not None else []
 
     def _layer(self, name):
         sub = self.lily.router.get(name)
@@ -40,7 +47,7 @@ class MemoryOrchestrator:
         record.setdefault("profile", getattr(llm, "last_profile", ""))
         record.setdefault("routed_via", getattr(llm, "last_routed_via", ""))
         self.last_run_id = run_log.record(self.db, record)
-        for taxonomy in (self.code, self.entities):
+        for taxonomy in (self.code, self.entities, self.taxonomy):   # the last one reads the first two
             try:
                 taxonomy.index_run(self.last_run_id, record.get("user_text", ""), record.get("answer", ""))
             except LilyError:

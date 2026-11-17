@@ -35,10 +35,24 @@ class Store:
         except sqlite3.Error as err:
             raise LilyError(f"notes database error: {err}") from err
 
-    def search(self, match, limit):
-        """Best matches first. `match` is an FTS5 expression. Returns (source, body) rows."""
-        sql = "SELECT source, body FROM notes WHERE notes MATCH ? ORDER BY rank LIMIT ?"
-        return self._query(sql, (match, limit))
+    def search(self, match, limit, sources=None):
+        """Best matches first. `match` is an FTS5 expression. Returns (source, body) rows.
+
+        `sources`, if given, keeps only passages from those sources (the taxonomy uses this).
+        """
+        if sources is None:
+            sql = "SELECT source, body FROM notes WHERE notes MATCH ? ORDER BY rank LIMIT ?"
+            return self._query(sql, (match, limit))
+        wanted, found = set(sources), []
+        try:
+            for source, body in self.db.execute("SELECT source, body FROM notes WHERE notes MATCH ? ORDER BY rank", (match,)):
+                if source in wanted:
+                    found.append((source, body))
+                    if len(found) >= limit:
+                        break
+        except sqlite3.Error as err:
+            raise LilyError(f"notes database error: {err}") from err
+        return found
 
     def sources(self):
         """Every source with its chunk count: [(source, count), ...]."""

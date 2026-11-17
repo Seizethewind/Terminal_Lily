@@ -17,9 +17,12 @@ def to_match(query):
     return " OR ".join(f'"{word}"' for word in words[:MAX_WORDS])
 
 
-def find(store, query, limit=5):
-    """Passages as text, best first, each labelled with where it came from."""
+def find(store, query, limit=5, sources=None):
+    """Passages as text, best first, each labelled with where it came from.
+
+    `sources` (optional) limits the search to those notes.
+    """
     match = to_match(query)
     if not match or limit < 1:
         return []
-    return [f"[{source}] {body}" for source, body in store.search(match, limit)]
+    return [f"[{source}] {body}" for source, body in store.search(match, limit, sources)]

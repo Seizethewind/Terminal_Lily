@@ -24,7 +24,7 @@ python main.py
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
 `/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
 `/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
-`/export [all]`, `/stats`, `/code`, `/entity`, `/exit`.
+`/export [all]`, `/stats`, `/code`, `/entity`, `/taxonomy`, `/exit`.
 
 ## Choosing a model
 
@@ -187,7 +187,8 @@ Then restart Lily, and set your url in `config/mcp_servers.toml` again.
 2. Run `/tools` and check that built-ins, plugins and `lilyai__` tools loaded.
 3. If a new setting appeared, add it to your `.env` (see `.env.example`).
 4. If you added words to `config/languages.toml` or `config/entities.toml`, run
-   `/code scan` and `/entity scan` to re-file stored chats.
+   `/code scan` and `/entity scan` to re-file stored chats, then `/taxonomy scan`
+   so the universal taxonomy picks up the new filing.
 
 ## Notes (RAG)
 
@@ -282,6 +283,47 @@ not filed by accident.
   `/entity remove <word>` removes one you added.
 - `/entity scan` re-files all stored chats after you add words or edit the file.
 
+## Universal data taxonomy (foundation)
+
+One shared tree for organizing and filtering everything Lily stores. It only
+adds **labels beside** your data: chats and notes are never changed or moved.
+
+The four top-level categories (`config/taxonomy.toml`):
+
+- **entity**: things that exist
+- **geography**: places and spatial information
+- **nature**: natural systems and phenomena
+- **study**: knowledge, disciplines, discoveries, history, concepts and research
+
+Subcategories start empty on purpose. Paths are lowercase words joined by `/`,
+up to 6 levels, for example `study/history/medieval`.
+
+- A record can have **several labels** (one chat can be `study/history` and
+  `geography/city`).
+- A record with no label is **unclassified**. A label under `unknown/...` means
+  "looked at, does not fit yet". Both are normal and need no setup.
+- Any kind of record can be labelled (`run`, `note`, or a new word of your own),
+  so adding a new kind needs no code change.
+- The older `/entity` and `/code` filing feeds this tree automatically through
+  the `[legacy]` mapping in `config/taxonomy.toml` (for example `location`
+  becomes `geography`, `entity/animal` becomes `nature/animal`). Your own
+  labels always win over automatic ones on the same path.
+- Notes (RAG) can be searched inside one category.
+
+Commands:
+
+- `/taxonomy` shows the tree with counts.
+- `/taxonomy add <path> [description]` and `/taxonomy remove <path>` grow or
+  trim the tree (only categories you added, and only when empty).
+- `/taxonomy label <kind> <path> <ref>` and `/taxonomy unlabel <kind> <path|all> <ref>`.
+- `/taxonomy of <kind> <ref>` shows the labels of one record.
+- `/taxonomy show [all] <path> [path...]` filters records (any of the paths, or `all`).
+- `/taxonomy unclassified [kind]` lists records with no label (default `run`).
+- `/taxonomy search <path> <question>` searches only the notes filed there.
+- `/taxonomy scan` re-files stored chats from the older taxonomies.
+
+New top-level categories are added only in `config/taxonomy.toml`.
+
 ## Rules of this repo
 
 - Every Python file is **120 lines or fewer** and does **one thing**
@@ -305,7 +347,7 @@ you -> ui -> main orchestrator -> agent loop
 
 ```
 main.py            entry point
-config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, system_prompt.txt
+config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, taxonomy.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
 scripts/           setup_termux.sh (first install), update.sh (update from GitHub)
 lily/              orchestrator, agent_loop, router, state, bootstrap
@@ -316,7 +358,8 @@ lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_s
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
 lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding and entity taxonomies
-lily/ui/           terminal loop, rich renderer, slash commands
+lily/memory/taxonomy/  universal taxonomy: paths, tree, label store, legacy bridge, report, service
+lily/ui/           terminal loop, rich renderer, slash commands (commands_*.py: one file per command group)
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
 ```

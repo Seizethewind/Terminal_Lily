@@ -1,0 +1,39 @@
+# The universal data taxonomy. It only organizes and filters what Lily has stored:
+# labels point at records (chats, notes...) and never change them.
+#
+# A record can carry several labels (one chat can be study/history AND geography/city).
+# A record with no label is "unclassified". A label under "unknown/..." means
+# "looked at, does not fit anywhere yet". Both are normal and nothing is lost.
+#
+# Paths are lowercase words joined by "/": study/history/medieval (up to 6 levels).
+
+# The four top-level categories. Changing this list is the only way to add a new one.
+[roots]
+entity = "Things that exist"
+geography = "Places and spatial information"
+nature = "Natural systems and phenomena"
+study = "Knowledge, disciplines, discoveries, history, concepts and research"
+
+# Subcategories start empty on purpose. Grow the tree any time, with no code change:
+#   inside Lily:  /taxonomy add study/history "the past, and how we know it"
+#   or here:      "study/history" = "the past, and how we know it"
+# The bridge below also adds the paths it needs the first time a chat uses them.
+[sub]
+
+# How the older word-list taxonomy (/entity) and code blocks (/code) feed this one.
+# "class" sends every subclass below it (entity/person -> entity/person);
+# "class/sub" sends one subclass to an exact path. Longest key wins.
+# Anything not listed lands in unknown/<class>. "code" is any chat that has a code block.
+[legacy]
+entity = "entity"
+"entity/animal" = "nature/animal"
+"entity/plant" = "nature/plant"
+object = "entity/object"
+location = "geography"
+literature = "study/literature"
+science = "study/science"
+math = "study/math"
+history = "study/history"
+computing = "study/computing"
+programming = "study/programming"
+code = "study/programming"
