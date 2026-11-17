@@ -6,6 +6,7 @@ from lily.orchestrator import Lily
 SUBS = (
     "lily.llm.orchestrator", "lily.tools.orchestrator",
     "lily.rag.orchestrator", "lily.memory.orchestrator",
+    "lily.self.orchestrator",
 )
 
 

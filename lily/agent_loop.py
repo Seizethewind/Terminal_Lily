@@ -4,6 +4,7 @@ from lily.utils.logger import get_logger
 
 log = get_logger("agent")
 NO_LLM = "My LLM layer isn't installed yet, so I can't answer. It arrives in the next update."
+RECALL = ("rag", "self")   # layers that add context before the model thinks
 
 
 class AgentLoop:
@@ -35,13 +36,14 @@ class AgentLoop:
         return f"I stopped after {self.max_steps} steps without a final answer."
 
     def _recall(self, state, query):
-        rag = self.router.get("rag")
-        if rag is None:
-            return
-        try:
-            rag.run(state, query=query)
-        except LilyError as err:
-            log.warning("rag failed: %s", err)
+        for name in RECALL:
+            sub = self.router.get(name)
+            if sub is None:
+                continue
+            try:
+                sub.run(state, query=query)
+            except LilyError as err:
+                log.warning("%s failed: %s", name, err)
 
     def _act(self, target, state, call):
         sub = self.router.get(target)

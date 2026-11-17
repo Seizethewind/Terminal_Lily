@@ -13,7 +13,10 @@ class Tool(BaseTool):
     def run(self):
         return "ok"
 '''
-BUILTIN = {"shell", "read_file", "write_file", "web_search", "termux_api", "rag_search"}
+BUILTIN = {
+    "shell", "read_file", "write_file", "web_search", "termux_api", "rag_search",
+    "delegate", "task_status", "approve_task", "remember",   # the self layer's tools
+}
 
 
 def plugin_folder(files):

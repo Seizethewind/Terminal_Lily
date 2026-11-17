@@ -8,6 +8,7 @@ from lily.utils.errors import LilyError
 from lily.utils.logger import get_logger
 
 log = get_logger("lily")
+RECORDERS = ("memory", "self")   # layers that get every finished turn
 
 
 class Lily:
@@ -33,16 +34,17 @@ class Lily:
         return answer
 
     def _record(self, text, answer, started, error=""):
-        """Give the finished turn to the memory layer, if installed. Never fails the chat."""
-        memory = self.router.get("memory")
-        if memory is None:
-            return
+        """Give the finished turn to the memory layers, if installed. Never fails the chat."""
         millis = int((time.monotonic() - started) * 1000)
         record = {"user_text": text, "answer": answer, "error": error, "latency_ms": millis, **self.loop.last}
-        try:
-            memory.run(self.state, record=record)
-        except Exception:   # noqa: BLE001 - logging a turn must never break the chat
-            log.exception("could not record the run")
+        for name in RECORDERS:
+            sub = self.router.get(name)
+            if sub is None:
+                continue
+            try:
+                sub.run(self.state, record=record)
+            except Exception:   # noqa: BLE001 - logging a turn must never break the chat
+                log.exception("could not record the run (%s)", name)
 
     @property
     def model(self):
