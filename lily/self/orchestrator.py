@@ -1,4 +1,6 @@
 """Self sub orchestrator: Lily's character, memory, workers and hive mind in one place."""
+from pathlib import Path
+
 from lily.self import personality
 from lily.self.chat_memory import ChatMemory
 from lily.self.config import SelfConfig
@@ -8,7 +10,6 @@ from lily.self.router import ModelRouter
 from lily.self.task_completion import TaskLog
 from lily.utils.errors import ConfigError
 from lily.utils.logger import get_logger
-from lily.utils.paths import ensure_data_dir
 
 log = get_logger("self")
 CLIP = 300
@@ -88,4 +89,6 @@ def register(lily):
     if not cfg.endpoints:
         log.warning("self layer is off: no router url in config/self.toml")
         return
-    lily.register(SelfOrchestrator(lily, cfg, ensure_data_dir()))
+    data_dir = Path(lily.settings.data_dir)
+    data_dir.mkdir(parents=True, exist_ok=True)
+    lily.register(SelfOrchestrator(lily, cfg, data_dir))
