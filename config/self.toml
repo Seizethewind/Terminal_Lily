@@ -6,7 +6,7 @@ url = "https://vansrouter-36le.onrender.com/v1"
 key_env = "SELF_API_KEY"
 
 [workers]   # the background workers' router; Lily's router is its fallback
-url = "https://freellmapi-eqcl.onrender.com/v1"
+url = "https://lilyaiapi.onrender.com/v1"
 key_env = "LILY_API_KEY"
 
 [tiers]     # workload tier -> model string sent to the router

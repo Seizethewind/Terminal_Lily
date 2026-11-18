@@ -39,9 +39,9 @@ class ModelRouter:
     def model(self, tier):
         return self.cfg.tiers[tier]
 
-    def chat(self, kind, tier, messages, tools=None):
+    def chat(self, kind, tier, messages, tools=None, model=None):
         """Ask the first router for `kind` ('worker' or 'lily'); if it fails, use the other one."""
-        payload = prompt_builder.build(self.model(tier), messages, tools)
+        payload = prompt_builder.build(model or self.model(tier), messages, tools)
         errors = []
         for name in ORDER[kind]:
             if name not in self.providers:
