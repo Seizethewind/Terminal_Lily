@@ -3,7 +3,10 @@ import unittest
 from lily.bootstrap import build
 from lily.llm.orchestrator import LLMOrchestrator
 from lily.orchestrator import Lily
+from lily.self.config import SelfConfig
+from lily.self.router import ModelRouter
 from lily.state import State
+from lily.utils.errors import LLMError
 from tests.fakes import (SCHEMA, FakeProvider, FakeTools, make_settings,
                          text_reply, tool_reply)
 
@@ -72,6 +75,41 @@ class OrchestratorTests(unittest.TestCase):
         _, llm, provider = setup(text_reply("yo"))
         llm.run(state)
         self.assertEqual(provider.payloads[0]["messages"], state.view())
+
+
+class _Down:
+    def chat(self, payload):
+        raise LLMError("down")
+
+
+class _SelfLayer:
+    name = "self"
+
+    def __init__(self, models):
+        self.models = models
+
+    def run(self, state, **kwargs):
+        return ""
+
+
+class FallbackTests(unittest.TestCase):
+    def chat_with(self, lily_provider, workers_provider):
+        models = ModelRouter(SelfConfig({}), {"lily": lily_provider, "workers": workers_provider},
+                             clock=lambda: 0.0)
+        lily = Lily(make_settings())
+        lily.register(_SelfLayer(models))
+        lily.register(LLMOrchestrator(lily))
+        return lily.handle("hi")
+
+    def test_chat_uses_lily_router_first(self):
+        workers = FakeProvider()
+        self.assertEqual(self.chat_with(FakeProvider(text_reply("from lily")), workers), "from lily")
+        self.assertEqual(workers.payloads, [])
+
+    def test_chat_falls_back_to_workers_router(self):
+        workers = FakeProvider(text_reply("from workers"))
+        self.assertEqual(self.chat_with(_Down(), workers), "from workers")
+        self.assertEqual(workers.payloads[0]["model"], "auto")
 
 
 if __name__ == "__main__":
