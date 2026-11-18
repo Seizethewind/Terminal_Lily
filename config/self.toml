@@ -1,11 +1,9 @@
-# Lily herself: two routers, workload tiers, roles and limits.
+# Lily herself: router, workload tiers, roles and limits.
 # Keys never go in this file: key_env names the variable in .env.
+# One router serves Lily and her workers. To add a second one as a fallback, add a [lily]
+# section with its url and key_env; the router code already tries each one in turn.
 
-[lily]      # her own router: personality, taking over failed tasks, final say
-url = "https://vansrouter-36le.onrender.com/v1"
-key_env = "SELF_API_KEY"
-
-[workers]   # the background workers' router; Lily's router is its fallback
+[workers]   # the router for Lily's chat and her background workers
 url = "https://lilyaiapi.onrender.com/v1"
 key_env = "LILY_API_KEY"
 
