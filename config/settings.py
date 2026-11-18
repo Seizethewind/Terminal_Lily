@@ -60,7 +60,7 @@ class Settings:
         prompt_file = config_dir / "system_prompt.txt"
         prompt = prompt_file.read_text(encoding="utf-8").strip() if prompt_file.is_file() else ""
         return cls(
-            base_url=os.environ.get("LILY_BASE_URL", "http://127.0.0.1:3001/v1"),
+            base_url=os.environ.get("LILY_BASE_URL", "https://lilyaiapi.onrender.com/v1"),
             api_key=os.environ.get("LILY_API_KEY", ""),
             profiles=profiles,
             profile=default,
