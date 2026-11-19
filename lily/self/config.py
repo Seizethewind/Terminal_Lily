@@ -23,7 +23,7 @@ class SelfConfig:
         for name in ("lily", "workers"):
             section = data.get(name) or {}
             if section.get("url"):
-                key = os.environ.get(section.get("key_env", ""), "")
+                key = os.environ.get(section.get("key_env", "")) or "not_set"
                 self.endpoints[name] = {"url": section["url"], "key": key}
 
     @classmethod
