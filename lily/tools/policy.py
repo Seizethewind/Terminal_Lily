@@ -1,26 +1,35 @@
 """Decides what Lily may do without asking: looking is free, changing things asks."""
 from pathlib import Path
 
-from lily.tools import shell_safety
+from lily.tools import shell_risk, shell_safety
 from lily.tools.secrets import is_secret
 from lily.utils.paths import in_workplace
 
-FREE = {"rag_search", "web_search", "task_status", "remember", "delegate", "show_changes", "discard_changes"}
+BOOKKEEPING = {"task_status", "remember", "delegate", "show_changes", "discard_changes"}   # Lily's own notes
 SELF_ASKING = {"apply_changes", "undo_apply"}   # these show the file list and ask the user themselves
+LOOKUP = {"rag_search", "web_search"}
 FREE_TERMUX = {"battery"}
 
 
-def decide(name, args, staged=False):
+def decide(name, args, staged=False, level="basic"):
     """'allow' (no question), 'write' (one question per folder and task) or 'ask' (every time).
 
     `staged` is True when writes only wait in the staging area, so writing needs no question.
+    `level` is the autonomy level: none asks about every outside action, full also runs ordinary commands.
     """
-    if name in FREE or name in SELF_ASKING:
+    if name in BOOKKEEPING or name in SELF_ASKING:
+        return "allow"
+    if level == "none":
+        return "ask"
+    if name in LOOKUP:
         return "allow"
     if name == "read_file":
         return "ask" if is_secret(args.get("path", "")) else "allow"
     if name == "shell":
-        return "allow" if shell_safety.is_read_only(args.get("command", "")) else "ask"
+        command = args.get("command", "")
+        if shell_safety.is_read_only(command) or (level == "full" and not shell_risk.is_risky(command)):
+            return "allow"
+        return "ask"
     if name == "termux_api":
         return "allow" if args.get("action") in FREE_TERMUX else "ask"
     if name == "write_file":

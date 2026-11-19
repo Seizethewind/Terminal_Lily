@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from lily.self import personality
+from lily.self.autonomy import LEVELS, Autonomy
 from lily.self.chat_memory import ChatMemory
 from lily.self.config import SelfConfig
 from lily.self.dispatcher import Dispatcher
@@ -31,6 +32,7 @@ class SelfOrchestrator:
         self.hive = HiveMind()
         self.models = ModelRouter(cfg)
         self.staging = Staging(data_dir / "staging") if cfg.staging["enabled"] else None
+        self.autonomy = Autonomy(data_dir, cfg.autonomy["level"])
         self.dispatcher = Dispatcher(lily, self, self.tasks)
 
     def run(self, state, query=None, record=None, **kwargs):
@@ -63,6 +65,8 @@ class SelfOrchestrator:
         waiting = self.staging.count() if self.staging else 0
         if waiting:
             lines.append(f"{waiting} staged file(s) wait for the user to apply (show_changes, then apply_changes).")
+        if self.autonomy.level != "basic":
+            lines.append(f"Autonomy level is {self.autonomy.level}: {LEVELS[self.autonomy.level]}.")
         return lines + self.hive.snapshot()
 
     def delegate(self, role, task):

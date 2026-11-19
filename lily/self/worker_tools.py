@@ -34,7 +34,8 @@ class WorkerTools:
         tool = None if name in LILY_ONLY else self._registry().get(name)
         if tool is None:
             raise ToolError(f"no tool named '{name}' is available to workers")
-        verdict = policy.decide(name, args, access.staging(self.lily) is not None)
+        staged = access.staging(self.lily) is not None
+        verdict = policy.decide(name, args, staged, access.level(self.lily))
         if verdict != "allow" and not self._approved(tool, args, verdict):
             self.hive.note(self.task_id, f"{name}: the user did not approve")
             raise ToolError(f"the user did not approve {name}")

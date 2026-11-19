@@ -13,6 +13,7 @@ DEFAULTS = {
                "breaker_pause": 60, "recent_turns": 6, "timeout": 60},
     "personality": {"text": ""},
     "staging": {"enabled": True},   # writes wait for one apply instead of landing at once
+    "autonomy": {"level": "basic"},   # the level on a first start; /auto changes it and it is remembered
 }
 
 
