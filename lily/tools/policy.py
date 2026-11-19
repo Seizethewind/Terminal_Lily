@@ -5,8 +5,9 @@ from lily.tools import shell_risk, shell_safety
 from lily.tools.secrets import is_secret
 from lily.utils.paths import in_workplace
 
-FREE = {"rag_search", "web_search", "task_status", "remember", "delegate", "show_changes", "discard_changes"}
+BOOKKEEPING = {"task_status", "remember", "delegate", "show_changes", "discard_changes"}   # Lily's own notes
 SELF_ASKING = {"apply_changes", "undo_apply"}   # these show the file list and ask the user themselves
+LOOKUP = {"rag_search", "web_search"}
 FREE_TERMUX = {"battery"}
 
 
@@ -16,10 +17,11 @@ def decide(name, args, staged=False, level="basic"):
     `staged` is True when writes only wait in the staging area, so writing needs no question.
     `level` is the autonomy level: none asks about every outside action, full also runs ordinary commands.
     """
-    inside = name in FREE or name in SELF_ASKING   # Lily's own bookkeeping, never outside the app
-    if level == "none" and not inside:
+    if name in BOOKKEEPING or name in SELF_ASKING:
+        return "allow"
+    if level == "none":
         return "ask"
-    if inside:
+    if name in LOOKUP:
         return "allow"
     if name == "read_file":
         return "ask" if is_secret(args.get("path", "")) else "allow"
