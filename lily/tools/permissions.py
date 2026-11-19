@@ -18,7 +18,8 @@ class Permissions:
         return self.grants
 
     def allow(self, tool, args, state=None):
-        verdict = policy.decide(tool.name, args, access.staging(self.lily) is not None)
+        staged = access.staging(self.lily) is not None
+        verdict = policy.decide(tool.name, args, staged, access.level(self.lily))
         if verdict == "allow":
             return True
         grants = self._grants_now(state)
