@@ -9,8 +9,9 @@ from unittest import mock
 from lily.self import access
 from lily.self.autonomy import Autonomy
 from lily.self.staging import Staging
-from lily.tools import policy, shell_risk
+from lily.tools import policy, shell_risk, shell_safety
 from lily.tools.builtin import apply_changes
+from lily.tools.secrets import is_secret
 from lily.utils.errors import LilyError
 from lily.utils.paths import workplace
 
@@ -58,6 +59,12 @@ class LevelTests(unittest.TestCase):
     def test_full_never_skips_secrets_or_unknown_tools(self):
         self.assertEqual(policy.decide("read_file", {"path": ".env"}, True, "full"), "ask")
         self.assertEqual(policy.decide("some_plugin", {}, True, "full"), "ask")
+
+    def test_printing_the_environment_is_never_quiet(self):
+        for command in ("echo $LILY_API_KEY", "echo ${HOME}", "cat /proc/self/environ"):
+            self.assertEqual(policy.decide("shell", {"command": command}, True, "basic"), "ask", command)
+        self.assertFalse(shell_safety.is_read_only("echo $LILY_API_KEY"))
+        self.assertTrue(is_secret("/proc/self/environ"))
 
     def test_apply_asks_only_below_semi(self):
         staging = Staging(Path(self.base) / "stage")

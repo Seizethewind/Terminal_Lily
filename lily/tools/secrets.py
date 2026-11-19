@@ -5,6 +5,7 @@ from pathlib import PurePath
 NAMES = (
     ".env*", "*.pem", "*.key", "id_rsa*", "id_ed25519*", "*token*", "*secret*",
     "*password*", "credentials*", ".netrc", ".git-credentials", "authorized_keys",
+    "environ",   # /proc/<pid>/environ holds every environment variable, API keys included
 )
 FOLDERS = {".ssh", ".gnupg", ".aws"}
 

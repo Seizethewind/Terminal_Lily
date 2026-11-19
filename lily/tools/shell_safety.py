@@ -12,7 +12,8 @@ READ_ONLY = {
 }
 GIT_READ = {"status", "log", "diff", "show"}
 FIND_WRITES = {"-exec", "-execdir", "-ok", "-okdir", "-delete", "-fprint", "-fprintf", "-fls"}
-BAD = (">", "<", "`", "$(", "${", ";", "&", "||", "\n", "\r")   # redirects, chaining, substitution
+# redirects, chaining, substitution, and any $ (a variable can print a key from the environment)
+BAD = (">", "<", "`", "$", ";", "&", "||", "\n", "\r")
 NOISE = ("2>/dev/null", "2>&1")   # harmless, very common
 
 
