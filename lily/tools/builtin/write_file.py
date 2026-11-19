@@ -1,8 +1,7 @@
 """Write or append to a text file."""
-from pathlib import Path
-
 from lily.tools.base import BaseTool
 from lily.utils.errors import ToolError
+from lily.utils.paths import in_workplace, workplace
 
 
 class Tool(BaseTool):
@@ -11,7 +10,7 @@ class Tool(BaseTool):
     parameters = {
         "type": "object",
         "properties": {
-            "path": {"type": "string", "description": "file path (~ is allowed)"},
+            "path": {"type": "string", "description": "file path inside the workplace (a relative path starts there)"},
             "content": {"type": "string", "description": "the text to write"},
             "append": {"type": "boolean", "description": "add to the end instead of replacing"},
         },
@@ -19,7 +18,9 @@ class Tool(BaseTool):
     }
 
     def run(self, path, content, append=False):
-        file = Path(path).expanduser()
+        file = in_workplace(path)
+        if workplace() not in file.parents:
+            raise ToolError(f"{file} is outside the workplace {workplace()}; Lily only writes there")
         try:
             file.parent.mkdir(parents=True, exist_ok=True)
             with open(file, "a" if append else "w", encoding="utf-8") as handle:

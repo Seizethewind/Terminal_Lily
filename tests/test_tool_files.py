@@ -4,11 +4,12 @@ from pathlib import Path
 
 from lily.tools.builtin import read_file, write_file
 from lily.utils.errors import ToolError
+from lily.utils.paths import workplace
 
 
 class FileToolTests(unittest.TestCase):
     def setUp(self):
-        self.folder = Path(tempfile.mkdtemp())
+        self.folder = Path(tempfile.mkdtemp(dir=workplace()))
         self.write = write_file.Tool(None)
         self.read = read_file.Tool(None)
 

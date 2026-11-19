@@ -1,8 +1,7 @@
 """Read a text file."""
-from pathlib import Path
-
 from lily.tools.base import BaseTool, to_int
 from lily.utils.errors import ToolError
+from lily.utils.paths import in_workplace
 
 MAX_BYTES = 2_000_000
 
@@ -13,14 +12,14 @@ class Tool(BaseTool):
     parameters = {
         "type": "object",
         "properties": {
-            "path": {"type": "string", "description": "file path (~ is allowed)"},
+            "path": {"type": "string", "description": "file path (a relative path starts in the workplace)"},
             "offset": {"type": "integer", "description": "characters to skip, default 0"},
         },
         "required": ["path"],
     }
 
     def run(self, path, offset=0):
-        file = Path(path).expanduser()
+        file = in_workplace(path)
         if not file.is_file():
             raise ToolError(f"not a file: {file}")
         try:

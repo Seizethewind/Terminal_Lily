@@ -3,6 +3,7 @@ from pathlib import Path
 
 from lily.tools import shell_safety
 from lily.tools.secrets import is_secret
+from lily.utils.paths import in_workplace
 
 FREE = {"rag_search", "web_search", "task_status", "remember", "delegate"}
 FREE_TERMUX = {"battery"}
@@ -25,7 +26,7 @@ def decide(name, args):
 
 def folder(args):
     """The folder a write_file call would change."""
-    return Path(str(args.get("path", "."))).expanduser().resolve().parent
+    return in_workplace(args.get("path", ".")).parent
 
 
 def covered(target, grants):

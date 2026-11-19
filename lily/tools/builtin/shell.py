@@ -3,6 +3,7 @@ import subprocess
 
 from lily.tools.base import BaseTool, to_int
 from lily.utils.errors import ToolError
+from lily.utils.paths import workplace
 
 
 class Tool(BaseTool):
@@ -22,7 +23,7 @@ class Tool(BaseTool):
         try:
             done = subprocess.run(
                 command, shell=True, capture_output=True, text=True, errors="replace",
-                stdin=subprocess.DEVNULL, timeout=limit,
+                stdin=subprocess.DEVNULL, timeout=limit, cwd=workplace(),
             )
         except subprocess.TimeoutExpired:
             raise ToolError(f"the command was stopped after {limit} seconds") from None
