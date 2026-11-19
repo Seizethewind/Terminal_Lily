@@ -6,12 +6,13 @@ import time
 
 from lily.llm import prompt_builder
 from lily.llm.providers.openai_compat import OpenAICompat
+from lily.self.ollama import LocalProvider
 from lily.utils.errors import LLMError
 from lily.utils.logger import get_logger
 
 log = get_logger("self.router")
 TIERS = ("light", "normal", "heavy")
-ORDER = {"worker": ("workers", "lily"), "lily": ("lily", "workers")}   # first choice, then fallback
+ORDER = {"worker": ("workers", "lily", "local"), "lily": ("lily", "workers", "local")}   # local is the last resort
 
 
 class ModelRouter:
@@ -20,7 +21,8 @@ class ModelRouter:
         self.clock = clock
         timeout = cfg.limits["timeout"]
         self.providers = providers or {
-            name: OpenAICompat(ep["url"], ep["key"], timeout) for name, ep in cfg.endpoints.items()
+            name: (LocalProvider if name == "local" else OpenAICompat)(ep["url"], ep["key"], ep["timeout"] or timeout)
+            for name, ep in cfg.endpoints.items()
         }
         self.fails = dict.fromkeys(self.providers, 0)
         self.paused = dict.fromkeys(self.providers, 0.0)
@@ -40,8 +42,7 @@ class ModelRouter:
         return self.cfg.tiers[tier]
 
     def chat(self, kind, tier, messages, tools=None, model=None):
-        """Ask the first router for `kind` ('worker' or 'lily'); if it fails, use the other one."""
-        payload = prompt_builder.build(model or self.model(tier), messages, tools)
+        """Ask the first router for `kind` ('worker' or 'lily'); if it fails, try the next, local last."""
         errors = []
         for name in ORDER[kind]:
             if name not in self.providers:
@@ -49,6 +50,8 @@ class ModelRouter:
             if self.clock() < self.paused[name]:
                 errors.append(f"{name}: paused after repeated failures")
                 continue
+            ours = self.cfg.endpoints.get(name, {}).get("model")   # a router may need its own model name
+            payload = prompt_builder.build(ours or model or self.model(tier), messages, tools)
             try:
                 reply = self.providers[name].chat(payload)
             except LLMError as err:
