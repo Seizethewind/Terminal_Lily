@@ -5,5 +5,5 @@ from lily.utils.errors import ToolError
 def of(lily):
     sub = lily.router.get("self")
     if sub is None:
-        raise ToolError("Lily's self layer is off: check config/self.toml and .env (SELF_API_KEY)")
+        raise ToolError("Lily's self layer is off: check config/self.toml and .env (LILY_API_KEY)")
     return sub
