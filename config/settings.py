@@ -61,7 +61,7 @@ class Settings:
         prompt = prompt_file.read_text(encoding="utf-8").strip() if prompt_file.is_file() else ""
         return cls(
             base_url=os.environ.get("LILY_BASE_URL", "https://lilyaiapi.onrender.com/v1"),
-            api_key=os.environ.get("LILY_API_KEY", ""),
+            api_key=os.environ.get("LILY_API_KEY") or "not_set",   # replace with your key in .env
             profiles=profiles,
             profile=default,
             system_prompt=prompt,
