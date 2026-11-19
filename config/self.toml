@@ -1,11 +1,16 @@
 # Lily herself: router, workload tiers, roles and limits.
 # Keys never go in this file: key_env names the variable in .env.
-# One router serves Lily and her workers. To add a second one as a fallback, add a [lily]
-# section with its url and key_env; the router code already tries each one in turn.
+# [workers] is the router for Lily and her workers. [local] is the Ollama fallback: Lily starts
+# it herself (models in data/models) and only when the router fails. Turn either off in .env.
 
 [workers]   # the router for Lily's chat and her background workers
 url = "https://lilyaiapi.onrender.com/v1"
 key_env = "LILY_API_KEY"
+
+[local]     # Ollama on this phone: only used when the router fails or there is no internet.
+url = "http://127.0.0.1:11434/v1"
+model = "Lily_Local"   # create it first: ollama cp <a model you pulled> Lily_Local
+timeout = 180          # a small model can be slow on a phone
 
 [tiers]     # workload tier -> model string sent to the router
 light = "auto:fast"

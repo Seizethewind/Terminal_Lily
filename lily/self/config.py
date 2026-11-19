@@ -1,5 +1,6 @@
 """Reads config/self.toml: the router, workload tiers, roles and limits."""
 import os
+import shutil
 import tomllib
 from pathlib import Path
 
@@ -21,12 +22,19 @@ class SelfConfig:
     def __init__(self, data):
         for key, default in DEFAULTS.items():
             setattr(self, key, {**default, **(data.get(key) or {})})
-        self.endpoints = {}   # router name -> {"url", "key"}; a router without a url is off
-        for name in ("lily", "workers"):
+        self.endpoints = {}   # router name -> url, key, model, timeout; a router without a url is off
+        for name in ("lily", "workers", "local"):
             section = data.get(name) or {}
             if section.get("url"):
-                key = os.environ.get(section.get("key_env", "")) or "not_set"
-                self.endpoints[name] = {"url": section["url"], "key": key}
+                env = section.get("key_env")
+                key = (os.environ.get(env) or "not_set") if env else ""
+                self.endpoints[name] = {"url": section["url"], "key": key,
+                                        "model": section.get("model"), "timeout": section.get("timeout")}
+        if os.environ.get("LILY_ROUTER", "").lower() == "false":
+            self.endpoints.pop("lily", None)
+            self.endpoints.pop("workers", None)
+        if os.environ.get("LILY_LOCAL", "").lower() == "false" or not shutil.which("ollama"):
+            self.endpoints.pop("local", None)   # off by flag, or Ollama is not installed
 
     @classmethod
     def load(cls, path: Path = CONFIG_DIR / "self.toml"):
