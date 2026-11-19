@@ -1,4 +1,4 @@
-"""Reads config/self.toml: the two routers, workload tiers, roles and limits."""
+"""Reads config/self.toml: the router, workload tiers, roles and limits."""
 import os
 import tomllib
 from pathlib import Path
@@ -12,6 +12,7 @@ DEFAULTS = {
     "limits": {"max_workers": 3, "worker_steps": 6, "approval_wait": 120, "breaker_fails": 3,
                "breaker_pause": 60, "recent_turns": 6, "timeout": 60},
     "personality": {"text": ""},
+    "staging": {"enabled": True},   # writes wait for one apply instead of landing at once
 }
 
 

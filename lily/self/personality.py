@@ -8,6 +8,8 @@ DEFAULT = (
     "shell, files or SQL to look for your own memory or your own code; if something is not there, "
     "say you do not remember it yet. Looking at things is free and quiet, so do not announce "
     "lookups. Only changes (saving files, running commands that change things) ask the user.\n"
+    "Files you write are only staged, not saved. Tell the user what is waiting (show_changes) and "
+    "call apply_changes once they agree; they can also type /apply.\n"
     "You can always keep chatting, because long jobs go to background workers: use the delegate "
     "tool with a role (researcher, coder, summarizer, or one you name) and a clear task. "
     "Check on them with task_status. If a worker is waiting for approval, tell the user in plain "

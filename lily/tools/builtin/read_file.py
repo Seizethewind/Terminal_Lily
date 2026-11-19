@@ -1,4 +1,5 @@
 """Read a text file."""
+from lily.self import access
 from lily.tools.base import BaseTool, to_int
 from lily.utils.errors import ToolError
 from lily.utils.paths import in_workplace
@@ -20,6 +21,9 @@ class Tool(BaseTool):
 
     def run(self, path, offset=0):
         file = in_workplace(path)
+        staging = access.staging(self.lily)
+        if staging is not None and staging.has(file):   # a staged file reads as Lily left it
+            return staging.read(file)[to_int(offset, "offset", 0):]
         if not file.is_file():
             raise ToolError(f"not a file: {file}")
         try:

@@ -1,4 +1,5 @@
 """Write or append to a text file."""
+from lily.self import access
 from lily.tools.base import BaseTool
 from lily.utils.errors import ToolError
 from lily.utils.paths import in_workplace, workplace
@@ -6,7 +7,10 @@ from lily.utils.paths import in_workplace, workplace
 
 class Tool(BaseTool):
     name = "write_file"
-    description = "Write text to a file (creates folders as needed). Set append to add to the end instead."
+    description = (
+        "Write text to a file (creates folders as needed). Set append to add to the end instead. "
+        "Files may only be staged: they are saved when the user applies them."
+    )
     parameters = {
         "type": "object",
         "properties": {
@@ -21,6 +25,9 @@ class Tool(BaseTool):
         file = in_workplace(path)
         if workplace() not in file.parents:
             raise ToolError(f"{file} is outside the workplace {workplace()}; Lily only writes there")
+        staging = access.staging(self.lily)
+        if staging is not None:
+            return staging.stage_write(file, content, append)
         try:
             file.parent.mkdir(parents=True, exist_ok=True)
             with open(file, "a" if append else "w", encoding="utf-8") as handle:

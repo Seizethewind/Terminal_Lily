@@ -1,9 +1,11 @@
 """The tools a worker may use. Looking is free; changes wait for the user's approval."""
+from lily.self import access
 from lily.tools import policy, tidy
 from lily.tools.describe import describe
 from lily.utils.errors import LilyError, ToolError
 
-LILY_ONLY = {"delegate", "task_status", "approve_task", "remember"}    # workers must not use these
+# workers must not use these: only Lily talks to the user and saves what workers staged
+LILY_ONLY = {"delegate", "task_status", "approve_task", "remember", "apply_changes", "discard_changes", "undo_apply"}
 CLIP = 4000
 
 
@@ -32,7 +34,7 @@ class WorkerTools:
         tool = None if name in LILY_ONLY else self._registry().get(name)
         if tool is None:
             raise ToolError(f"no tool named '{name}' is available to workers")
-        verdict = policy.decide(name, args)
+        verdict = policy.decide(name, args, access.staging(self.lily) is not None)
         if verdict != "allow" and not self._approved(tool, args, verdict):
             self.hive.note(self.task_id, f"{name}: the user did not approve")
             raise ToolError(f"the user did not approve {name}")
