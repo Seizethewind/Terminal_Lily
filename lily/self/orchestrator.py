@@ -7,6 +7,7 @@ from lily.self.config import SelfConfig
 from lily.self.dispatcher import Dispatcher
 from lily.self.hive_mind import HiveMind
 from lily.self.router import ModelRouter
+from lily.self.staging import Staging
 from lily.self.task_completion import TaskLog
 from lily.utils.errors import ConfigError
 from lily.utils.logger import get_logger
@@ -29,6 +30,7 @@ class SelfOrchestrator:
         self.tasks = TaskLog(data_dir / "tasks.db")
         self.hive = HiveMind()
         self.models = ModelRouter(cfg)
+        self.staging = Staging(data_dir / "staging") if cfg.staging["enabled"] else None
         self.dispatcher = Dispatcher(lily, self, self.tasks)
 
     def run(self, state, query=None, record=None, **kwargs):
@@ -58,6 +60,9 @@ class SelfOrchestrator:
         done = self.tasks.unseen()
         lines += ["Task finished since you last spoke: " + self.tasks.line(row) for row in done]
         self.tasks.mark_seen([row[0] for row in done])
+        waiting = self.staging.count() if self.staging else 0
+        if waiting:
+            lines.append(f"{waiting} staged file(s) wait for the user to apply (show_changes, then apply_changes).")
         return lines + self.hive.snapshot()
 
     def delegate(self, role, task):

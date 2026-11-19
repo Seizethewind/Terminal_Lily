@@ -16,6 +16,7 @@ class Tool(BaseTool):
 BUILTIN = {
     "shell", "read_file", "write_file", "web_search", "termux_api", "rag_search",
     "delegate", "task_status", "approve_task", "remember",   # the self layer's tools
+    "show_changes", "apply_changes", "discard_changes", "undo_apply",   # staged writes
 }
 
 
