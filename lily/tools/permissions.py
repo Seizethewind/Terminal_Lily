@@ -1,4 +1,5 @@
 """Asks the user before a tool changes anything. Looking around is free (see policy.py)."""
+from lily.self import access
 from lily.tools import policy, tidy
 from lily.tools.describe import describe
 
@@ -17,7 +18,7 @@ class Permissions:
         return self.grants
 
     def allow(self, tool, args, state=None):
-        verdict = policy.decide(tool.name, args)
+        verdict = policy.decide(tool.name, args, access.staging(self.lily) is not None)
         if verdict == "allow":
             return True
         grants = self._grants_now(state)

@@ -3,14 +3,19 @@ from pathlib import Path
 
 from lily.tools import shell_safety
 from lily.tools.secrets import is_secret
+from lily.utils.paths import in_workplace
 
-FREE = {"rag_search", "web_search", "task_status", "remember", "delegate"}
+FREE = {"rag_search", "web_search", "task_status", "remember", "delegate", "show_changes", "discard_changes"}
+SELF_ASKING = {"apply_changes", "undo_apply"}   # these show the file list and ask the user themselves
 FREE_TERMUX = {"battery"}
 
 
-def decide(name, args):
-    """'allow' (no question), 'write' (one question per folder and task) or 'ask' (every time)."""
-    if name in FREE:
+def decide(name, args, staged=False):
+    """'allow' (no question), 'write' (one question per folder and task) or 'ask' (every time).
+
+    `staged` is True when writes only wait in the staging area, so writing needs no question.
+    """
+    if name in FREE or name in SELF_ASKING:
         return "allow"
     if name == "read_file":
         return "ask" if is_secret(args.get("path", "")) else "allow"
@@ -19,13 +24,15 @@ def decide(name, args):
     if name == "termux_api":
         return "allow" if args.get("action") in FREE_TERMUX else "ask"
     if name == "write_file":
-        return "ask" if is_secret(args.get("path", "")) else "write"
+        if is_secret(args.get("path", "")):
+            return "ask"
+        return "allow" if staged else "write"
     return "ask"   # plugins, MCP tools, approve_task and anything new
 
 
 def folder(args):
     """The folder a write_file call would change."""
-    return Path(str(args.get("path", "."))).expanduser().resolve().parent
+    return in_workplace(args.get("path", ".")).parent
 
 
 def covered(target, grants):
