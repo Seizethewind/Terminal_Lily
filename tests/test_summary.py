@@ -11,6 +11,7 @@ from lily.self.chat_memory import ChatMemory
 from lily.self.config import SelfConfig
 from lily.self.digest import Digest
 from lily.self.orchestrator import SelfOrchestrator
+from lily.utils.errors import LLMError
 
 LIMITS = {"summary_every": 2, "summary_chars": 100}
 
@@ -50,7 +51,14 @@ class SummaryTests(unittest.TestCase):
         sent = fake.seen[0][1]["content"]
         self.assertTrue("old news" in sent and "user: hi" in sent)
         self.assertEqual(len(text), 100)
-        self.assertEqual(summarizer.summarize(models(""), "keep me", [(1, "a", "b")], 100), "keep me")
+
+    def test_an_empty_answer_leaves_the_old_summary_alone(self):
+        self.memory.save_summary("keep me", 0)
+        self.chats(2)
+        digest = Digest(self.memory, models(""), LIMITS)
+        with self.assertRaises(LLMError):
+            digest.update()
+        self.assertEqual(self.memory.summary(), ("keep me", 0))
 
     def test_digest_folds_turns_in_and_waits_for_more(self):
         digest = Digest(self.memory, models(), LIMITS)
@@ -76,8 +84,10 @@ class SummaryTests(unittest.TestCase):
             raise RuntimeError("down")
         digest = Digest(self.memory, SimpleNamespace(tier=lambda *a: "light", chat=down), LIMITS)
         self.chats(2)
-        digest._background() if digest.busy.acquire() else None
+        digest.busy.acquire()
+        digest._background()   # logs the error and frees the lock instead of raising
         self.assertEqual(self.memory.summary(), ("", 0))
+        self.assertTrue(digest.busy.acquire(blocking=False))
 
     def test_the_brief_carries_the_summary(self):
         orchestrator = SelfOrchestrator(SimpleNamespace(), SelfConfig({}), Path(self.dir.name))
