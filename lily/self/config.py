@@ -9,7 +9,9 @@ from lily.utils.paths import CONFIG_DIR
 
 DEFAULTS = {
     "tiers": {"light": "auto:fast", "normal": "auto", "heavy": "auto:smart"},
-    "roles": {"default": "normal", "planner": "light", "summarizer": "light"},
+    # role -> tier; /roles shows and changes them, config/self.toml [roles] overrides these defaults
+    "roles": {"default": "normal", "planner": "light", "summarizer": "light", "namer": "light",
+              "coder": "heavy", "researcher": "normal", "takeover": "heavy"},
     "limits": {"max_workers": 3, "worker_steps": 6, "approval_wait": 120, "breaker_fails": 3,
                "breaker_pause": 60, "recent_turns": 6, "timeout": 60,
                "step_tries": 2, "max_plan_steps": 6, "plan_min_chars": 140,   # steps: tries per step, plan size

@@ -28,10 +28,14 @@ class ModelRouter:
         self.paused = dict.fromkeys(self.providers, 0.0)
         self.busy = 0   # workers running now; the dispatcher keeps this up to date
 
+    def role_tier(self, role):
+        """The tier a role is set to: the default role's tier for a role nobody named, 'normal' if misspelt."""
+        usual = self.cfg.roles.get(role, self.cfg.roles["default"])
+        return usual if usual in TIERS else "normal"
+
     def tier(self, role, task=""):
         """Light, normal or heavy: the role's usual tier, moved by task size and by how busy we are."""
-        usual = self.cfg.roles.get(role, self.cfg.roles["default"])
-        index = TIERS.index(usual) if usual in TIERS else 1
+        index = TIERS.index(self.role_tier(role))
         if len(task) > 1500:
             index = min(index + 1, 2)
         if self.busy >= self.cfg.limits["max_workers"]:
