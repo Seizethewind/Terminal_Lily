@@ -37,6 +37,8 @@ def worker_prompt(role, task, notes=(), done=()):
         task,
         "Use tools when needed. Some tools need the user's approval and may be refused: if one is "
         "refused, find another way or say what you could not do. "
+        "If a command fails, read the error, fix the cause and run it again; after a few failed "
+        "commands in a row your attempt is stopped and its changes are undone. "
         "Finish with a short, plain result the user can read.",
     ]
     if done:

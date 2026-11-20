@@ -1,8 +1,11 @@
 """The tools a worker may use. Looking is free; changes wait for the user's approval."""
 from lily.self import access
-from lily.tools import policy, tidy
+from lily.self.debug_guard import DebugGuard
+from lily.self.rollback import Rollback
+from lily.tools import policy, shell_safety, tidy
 from lily.tools.describe import describe
 from lily.utils.errors import LilyError, ToolError
+from lily.utils.paths import in_workplace
 
 # workers must not use these: only Lily talks to the user, saves what workers staged and restarts tasks
 LILY_ONLY = {
@@ -15,9 +18,19 @@ CLIP = 4000
 class WorkerTools:
     name = "tools"
 
-    def __init__(self, lily, hive, task_id, wait):
+    def __init__(self, lily, hive, task_id, wait, limits=None):
         self.lily, self.hive, self.task_id, self.wait = lily, hive, task_id, wait
         self.grants = set()   # folders the user let this task save into
+        limits = limits or {}
+        note = lambda line: hive.note(task_id, f"command failed: {line}")   # noqa: E731
+        self.guard = DebugGuard(limits.get("debug_tries", 3), note)   # stops an attempt that keeps failing
+        self.rollback = Rollback(lily, limits)                         # undoes what the attempt changed
+
+    def undo(self):
+        return self.rollback.undo()
+
+    def finish(self):
+        self.rollback.discard()
 
     def _registry(self):
         tools = self.lily.router.get("tools")
@@ -43,12 +56,23 @@ class WorkerTools:
             self.hive.note(self.task_id, f"{name}: the user did not approve")
             raise ToolError(f"the user did not approve {name}")
         self.hive.note(self.task_id, f"using {name}")
+        self._prepare(name, args)
         try:
-            return tool.execute(args)[:CLIP]
-        except LilyError:
+            output = tool.execute(args)[:CLIP]
+        except LilyError as err:
+            if name == "shell":
+                raise ToolError(f"{err}{self.guard.error(str(err))}") from err
             raise
         except Exception as err:   # noqa: BLE001 - a buggy tool must not crash the worker
             raise ToolError(f"{name} crashed: {err}") from err
+        return self.guard.after(output) if name == "shell" else output
+
+    def _prepare(self, name, args):
+        """Remember what is about to change, so a failed attempt can be undone."""
+        if name == "write_file":
+            self.rollback.before_write(in_workplace(args.get("path", "")))
+        elif name == "shell" and not shell_safety.is_read_only(args.get("command", "")):
+            self.rollback.before_command()
 
     def _approved(self, tool, args, verdict):
         target = policy.folder(args) if verdict == "write" else None

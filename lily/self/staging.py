@@ -17,6 +17,13 @@ class Staging:
         return (f"Staged {tidy.short(file)} ({len(content)} characters). It is NOT saved yet: "
                 "it waits until the user applies it. Tell them what is waiting.")
 
+    def restore(self, file, previous):
+        """Put a staged file back as it was: its earlier text, or gone if it was not staged before."""
+        if previous is None:
+            self.store.drop(file)
+        else:
+            self.store.stage(file, previous)
+
     def has(self, file):
         return self.store.get(file) is not None
 

@@ -12,7 +12,8 @@ DEFAULTS = {
     "roles": {"default": "normal", "planner": "light"},
     "limits": {"max_workers": 3, "worker_steps": 6, "approval_wait": 120, "breaker_fails": 3,
                "breaker_pause": 60, "recent_turns": 6, "timeout": 60,
-               "step_tries": 2, "max_plan_steps": 6, "plan_min_chars": 140},   # steps: tries per step, plan size
+               "step_tries": 2, "max_plan_steps": 6, "plan_min_chars": 140,   # steps: tries per step, plan size
+               "debug_tries": 3, "snapshot_max_files": 2000, "snapshot_max_mb": 20},   # failed commands in a row
     "personality": {"text": ""},
     "staging": {"enabled": True},   # writes wait for one apply instead of landing at once
     "autonomy": {"level": "basic"},   # the level on a first start; /auto changes it and it is remembered
