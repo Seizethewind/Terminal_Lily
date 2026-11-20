@@ -9,9 +9,10 @@ from lily.utils.paths import CONFIG_DIR
 
 DEFAULTS = {
     "tiers": {"light": "auto:fast", "normal": "auto", "heavy": "auto:smart"},
-    "roles": {"default": "normal"},
+    "roles": {"default": "normal", "planner": "light"},
     "limits": {"max_workers": 3, "worker_steps": 6, "approval_wait": 120, "breaker_fails": 3,
-               "breaker_pause": 60, "recent_turns": 6, "timeout": 60},
+               "breaker_pause": 60, "recent_turns": 6, "timeout": 60,
+               "step_tries": 2, "max_plan_steps": 6, "plan_min_chars": 140},   # steps: tries per step, plan size
     "personality": {"text": ""},
     "staging": {"enabled": True},   # writes wait for one apply instead of landing at once
     "autonomy": {"level": "basic"},   # the level on a first start; /auto changes it and it is remembered

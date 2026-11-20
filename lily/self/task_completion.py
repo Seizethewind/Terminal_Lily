@@ -31,8 +31,16 @@ class TaskLog:
         sql = "INSERT INTO tasks (role, task, status, started) VALUES (?, ?, 'running', ?)"
         return self._run(sql, (role, task, time.time()))[0]
 
+    def get(self, task_id):
+        rows = self._run(f"SELECT {COLUMNS} FROM tasks WHERE id=?", (task_id,))[1]
+        return rows[0] if rows else None
+
+    def reopen(self, task_id):
+        """A failed task runs again."""
+        self._run("UPDATE tasks SET status='running', result='' WHERE id=?", (task_id,))
+
     def finish(self, task_id, status, result, done_by):
-        sql = "UPDATE tasks SET status=?, result=?, done_by=?, ended=? WHERE id=?"
+        sql = "UPDATE tasks SET status=?, result=?, done_by=?, ended=?, seen=0 WHERE id=?"
         self._run(sql, (status, result, done_by, time.time(), task_id))
 
     def completed(self, count=10):

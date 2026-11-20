@@ -1,7 +1,7 @@
 """Self sub orchestrator: Lily's character, memory, workers and hive mind in one place."""
 from pathlib import Path
 
-from lily.self import personality
+from lily.self import personality, reports
 from lily.self.autonomy import LEVELS, Autonomy
 from lily.self.chat_memory import ChatMemory
 from lily.self.config import SelfConfig
@@ -9,6 +9,7 @@ from lily.self.dispatcher import Dispatcher
 from lily.self.hive_mind import HiveMind
 from lily.self.router import ModelRouter
 from lily.self.staging import Staging
+from lily.self.step_log import StepLog
 from lily.self.task_completion import TaskLog
 from lily.utils.errors import ConfigError
 from lily.utils.logger import get_logger
@@ -29,6 +30,7 @@ class SelfOrchestrator:
         self.lily, self.cfg = lily, cfg
         self.memory = ChatMemory(data_dir / "chat_memory.db")
         self.tasks = TaskLog(data_dir / "tasks.db")
+        self.steps = StepLog(data_dir / "tasks.db")
         self.hive = HiveMind()
         self.models = ModelRouter(cfg)
         self.staging = Staging(data_dir / "staging") if cfg.staging["enabled"] else None
@@ -73,12 +75,12 @@ class SelfOrchestrator:
         task_id = self.dispatcher.submit(role.strip().lower() or "worker", task)
         return f"Task #{task_id} started in the background. Keep chatting; check it with task_status."
 
+    def retry(self, task_id):
+        self.dispatcher.resume(task_id)
+        return f"Task #{task_id} restarted: only the steps that were not done will run again."
+
     def status(self):
-        lines = self.hive.snapshot()
-        done = self.tasks.completed(5)
-        if done:
-            lines += ["Finished tasks, newest first:"] + [self.tasks.line(row) for row in done]
-        return "\n".join(lines) or "No workers running and no finished tasks yet."
+        return reports.status(self)
 
     def approve(self, key, yes):
         if self.hive.answer(key, yes):
