@@ -17,6 +17,7 @@ BUILTIN = {
     "shell", "read_file", "write_file", "web_search", "termux_api", "rag_search",
     "delegate", "task_status", "approve_task", "remember", "retry_task",   # the self layer's tools
     "show_changes", "apply_changes", "discard_changes", "undo_apply",   # staged writes
+    "edit_file", "code_map",   # careful edits and a map of a folder
 }
 
 

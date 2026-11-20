@@ -5,6 +5,7 @@ from lily.self import personality, reports
 from lily.self.autonomy import LEVELS, Autonomy
 from lily.self.chat_memory import ChatMemory
 from lily.self.config import SelfConfig
+from lily.self.digest import Digest
 from lily.self.dispatcher import Dispatcher
 from lily.self.hive_mind import HiveMind
 from lily.self.router import ModelRouter
@@ -33,6 +34,7 @@ class SelfOrchestrator:
         self.steps = StepLog(data_dir / "tasks.db")
         self.hive = HiveMind()
         self.models = ModelRouter(cfg)
+        self.digest = Digest(self.memory, self.models, cfg.limits)
         self.staging = Staging(data_dir / "staging") if cfg.staging["enabled"] else None
         self.autonomy = Autonomy(data_dir, cfg.autonomy["level"])
         self.dispatcher = Dispatcher(lily, self, self.tasks)
@@ -43,6 +45,7 @@ class SelfOrchestrator:
             if record is not None:
                 if record.get("answer") and not record.get("error"):
                     self.memory.save_turn(record["user_text"], record["answer"])
+                    self.digest.maybe_run()
             else:
                 personality.apply(state, self.cfg)
                 state.context.extend(self._brief(query or "", state))
@@ -56,6 +59,9 @@ class SelfOrchestrator:
         facts = self.memory.facts()
         if facts:
             lines += [HEADER] + [f"- {fact}" for fact in facts]
+        summary = self.memory.summary()[0]
+        if summary:
+            lines += ["SHORT SUMMARY OF YOUR EARLIER CHATS WITH THE USER:", summary]
         if len(state.messages) < 10:   # a fresh session: remind her how the last one ended
             for user, answer in self.memory.earlier(self.cfg.limits["recent_turns"]):
                 lines.append(f"Earlier chat, user: {_cut(user)} | you: {_cut(answer)}")

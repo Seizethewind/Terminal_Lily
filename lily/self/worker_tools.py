@@ -69,7 +69,7 @@ class WorkerTools:
 
     def _prepare(self, name, args):
         """Remember what is about to change, so a failed attempt can be undone."""
-        if name == "write_file":
+        if name in policy.WRITES:
             self.rollback.before_write(in_workplace(args.get("path", "")))
         elif name == "shell" and not shell_safety.is_read_only(args.get("command", "")):
             self.rollback.before_command()

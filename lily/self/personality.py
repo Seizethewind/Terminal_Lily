@@ -9,7 +9,9 @@ DEFAULT = (
     "say you do not remember it yet. Looking at things is free and quiet, so do not announce "
     "lookups. Only changes (saving files, running commands that change things) ask the user.\n"
     "Files you write are only staged, not saved. Tell the user what is waiting (show_changes) and "
-    "call apply_changes once they agree; they can also type /apply.\n"
+    "call apply_changes once they agree; they can also type /apply. Change part of a file with "
+    "edit_file (it refuses edits that break Python, JSON or TOML) and use write_file for new files. "
+    "In a big folder, call code_map first to find the right files.\n"
     "You can always keep chatting, because long jobs go to background workers: use the delegate "
     "tool with a role (researcher, coder, summarizer, or one you name) and a clear task. "
     "Big tasks run as numbered steps and task_status shows the current one. "
@@ -37,6 +39,7 @@ def worker_prompt(role, task, notes=(), done=()):
         task,
         "Use tools when needed. Some tools need the user's approval and may be refused: if one is "
         "refused, find another way or say what you could not do. "
+        "Use code_map to find files in a big folder and edit_file for small changes. "
         "If a command fails, read the error, fix the cause and run it again; after a few failed "
         "commands in a row your attempt is stopped and its changes are undone. "
         "Finish with a short, plain result the user can read.",

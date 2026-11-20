@@ -1,4 +1,4 @@
-"""Every turn with the user, kept forever in SQLite, plus lasting facts about them."""
+"""Every turn with the user, kept forever in SQLite, plus lasting facts and a rolling summary."""
 import sqlite3
 import time
 from contextlib import closing
@@ -6,6 +6,7 @@ from contextlib import closing
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS turns (id INTEGER PRIMARY KEY, ts REAL, user TEXT, answer TEXT);
 CREATE TABLE IF NOT EXISTS facts (id INTEGER PRIMARY KEY, ts REAL, text TEXT UNIQUE);
+CREATE TABLE IF NOT EXISTS summary (id INTEGER PRIMARY KEY CHECK (id = 1), text TEXT, upto INTEGER);
 """
 
 
@@ -46,3 +47,18 @@ class ChatMemory:
     def facts(self, limit=40):
         rows = self._run("SELECT text FROM facts ORDER BY id DESC LIMIT ?", (limit,))
         return [row[0] for row in rows][::-1]
+
+    def summary(self):
+        """(text, id of the last turn it covers); ('', 0) before the first summary."""
+        rows = self._run("SELECT text, upto FROM summary WHERE id = 1")
+        return rows[0] if rows else ("", 0)
+
+    def count_since(self, upto):
+        return self._run("SELECT COUNT(*) FROM turns WHERE id > ?", (upto,))[0][0]
+
+    def since(self, upto, limit):
+        """(id, user, answer) of the turns after `upto`, oldest first."""
+        return self._run("SELECT id, user, answer FROM turns WHERE id > ? ORDER BY id LIMIT ?", (upto, limit))
+
+    def save_summary(self, text, upto):
+        self._run("INSERT OR REPLACE INTO summary (id, text, upto) VALUES (1, ?, ?)", (text, upto))

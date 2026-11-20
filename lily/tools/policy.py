@@ -7,7 +7,8 @@ from lily.utils.paths import in_workplace
 
 BOOKKEEPING = {"task_status", "remember", "delegate", "retry_task", "show_changes", "discard_changes"}   # Lily's own
 SELF_ASKING = {"apply_changes", "undo_apply"}   # these show the file list and ask the user themselves
-LOOKUP = {"rag_search", "web_search"}
+LOOKUP = {"rag_search", "web_search", "code_map"}
+WRITES = {"write_file", "edit_file"}
 FREE_TERMUX = {"battery"}
 
 
@@ -32,7 +33,7 @@ def decide(name, args, staged=False, level="basic"):
         return "ask"
     if name == "termux_api":
         return "allow" if args.get("action") in FREE_TERMUX else "ask"
-    if name == "write_file":
+    if name in WRITES:
         if is_secret(args.get("path", "")):
             return "ask"
         return "allow" if staged else "write"
@@ -40,7 +41,7 @@ def decide(name, args, staged=False, level="basic"):
 
 
 def folder(args):
-    """The folder a write_file call would change."""
+    """The folder a write_file or edit_file call would change."""
     return in_workplace(args.get("path", ".")).parent
 
 

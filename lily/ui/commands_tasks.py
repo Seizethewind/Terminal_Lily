@@ -1,4 +1,4 @@
-"""Slash commands for tasks: /tasks and /retry."""
+"""Slash commands for the self layer: /tasks, /retry and /summary."""
 from lily.ui.commands import command, layer
 
 
@@ -12,3 +12,11 @@ def _retry(lily, args):
     if not args or not args[0].isdigit():
         return "Usage: /retry <task number>"
     return layer(lily, "self").retry(int(args[0]))
+
+
+@command("summary", "show the short summary of earlier chats; /summary now refreshes it")
+def _summary(lily, args):
+    sub = layer(lily, "self")
+    if args and args[0] == "now":
+        sub.digest.update()
+    return sub.memory.summary()[0] or "No summary yet: one is written after every few chats."

@@ -28,6 +28,9 @@ def describe(name, args):
         what = "add text to the end of a file" if args.get("append") else "write to a file"
         size = len(str(args.get("content", "")))
         return what, [_cut(args.get("path", "?")), f"({size} characters of text)"]
+    if name == "edit_file":
+        size = (len(str(args.get("old", ""))), len(str(args.get("new", ""))))
+        return "change part of a file", [_cut(args.get("path", "?")), f"(replace {size[0]} characters with {size[1]})"]
     if name == "termux_api":
         details = [_cut(args[key]) for key in ("title", "text") if args.get(key)]
         return TERMUX.get(args.get("action"), "use your phone"), details
