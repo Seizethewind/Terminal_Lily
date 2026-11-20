@@ -5,7 +5,7 @@ from lily.tools import shell_risk, shell_safety
 from lily.tools.secrets import is_secret
 from lily.utils.paths import in_workplace
 
-BOOKKEEPING = {"task_status", "remember", "delegate", "show_changes", "discard_changes"}   # Lily's own notes
+BOOKKEEPING = {"task_status", "remember", "delegate", "retry_task", "show_changes", "discard_changes"}   # Lily's own
 SELF_ASKING = {"apply_changes", "undo_apply"}   # these show the file list and ask the user themselves
 LOOKUP = {"rag_search", "web_search"}
 FREE_TERMUX = {"battery"}

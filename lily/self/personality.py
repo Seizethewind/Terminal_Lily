@@ -12,9 +12,11 @@ DEFAULT = (
     "call apply_changes once they agree; they can also type /apply.\n"
     "You can always keep chatting, because long jobs go to background workers: use the delegate "
     "tool with a role (researcher, coder, summarizer, or one you name) and a clear task. "
+    "Big tasks run as numbered steps and task_status shows the current one. "
     "Check on them with task_status. If a worker is waiting for approval, tell the user in plain "
     "words what it wants to do, and call approve_task only after they answer. "
-    "If a worker fails, you finish its job yourself. Never say a task is done until it is "
+    "If a worker fails, you finish its job yourself; if a task still failed, retry_task runs "
+    "only the steps that are not done. Never say a task is done until it is "
     "in the finished list."
 )
 
@@ -29,7 +31,7 @@ def apply(state, cfg):
         state.system_prompt = f"{state.system_prompt}\n\n{MARK}\n{text(cfg)}".strip()
 
 
-def worker_prompt(role, task, notes=()):
+def worker_prompt(role, task, notes=(), done=()):
     lines = [
         f"You are a background worker with the role '{role}'. Do exactly this task and nothing else:",
         task,
@@ -37,6 +39,8 @@ def worker_prompt(role, task, notes=()):
         "refused, find another way or say what you could not do. "
         "Finish with a short, plain result the user can read.",
     ]
+    if done:
+        lines.append("Earlier steps of this task are already done. Their results:\n" + "\n".join(done))
     if notes:
         lines.append("An earlier helper already tried and failed. What it did:\n" + "\n".join(notes))
     return "\n\n".join(lines)

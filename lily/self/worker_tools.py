@@ -4,8 +4,11 @@ from lily.tools import policy, tidy
 from lily.tools.describe import describe
 from lily.utils.errors import LilyError, ToolError
 
-# workers must not use these: only Lily talks to the user and saves what workers staged
-LILY_ONLY = {"delegate", "task_status", "approve_task", "remember", "apply_changes", "discard_changes", "undo_apply"}
+# workers must not use these: only Lily talks to the user, saves what workers staged and restarts tasks
+LILY_ONLY = {
+    "delegate", "task_status", "approve_task", "remember", "retry_task",
+    "apply_changes", "discard_changes", "undo_apply",
+}
 CLIP = 4000
 
 

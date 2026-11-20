@@ -2,6 +2,7 @@
 
 kind 'worker' asks the workers' router first; kind 'lily' (a takeover) asks Lily's router first.
 `kit` is the self orchestrator: it has .cfg, .models (ModelRouter) and .hive.
+`done` holds the results of earlier steps of the same task.
 """
 from lily.agent_loop import AgentLoop
 from lily.router import Router
@@ -15,7 +16,7 @@ GAVE_UP = "I stopped after"   # what AgentLoop answers when it runs out of steps
 
 
 class SubAgent:
-    def __init__(self, lily, kit, task_id, role, task, kind="worker", notes=()):
+    def __init__(self, lily, kit, task_id, role, task, kind="worker", notes=(), done=()):
         self.task = task
         self.tier = kit.models.tier(role, task) if kind == "worker" else "heavy"
         tools = WorkerTools(lily, kit.hive, task_id, kit.cfg.limits["approval_wait"])
@@ -23,7 +24,7 @@ class SubAgent:
         router.register(WorkerLLM(kit.models, self.tier, tools, kind))
         router.register(tools)
         self.loop = AgentLoop(router, kit.cfg.limits["worker_steps"])
-        self.state = State(personality.worker_prompt(role, task, notes), profile="worker")
+        self.state = State(personality.worker_prompt(role, task, notes, done), profile="worker")
 
     def run(self):
         answer = self.loop.run(self.state, self.task)
