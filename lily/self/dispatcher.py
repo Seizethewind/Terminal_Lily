@@ -1,5 +1,6 @@
 """Runs workers in the background, and hands a failed task to Lily to finish."""
 import threading
+import time
 
 from lily.self import namer
 from lily.self.step_runner import StepRunner
@@ -63,8 +64,17 @@ class Dispatcher:
         except Exception:   # noqa: BLE001 - a missing title is never worth an error
             log.warning("could not name task %s", task_id)
 
+    def _notify(self, task_id, status, result, seconds):
+        """Tell the phone a task is finished. Never raises: it must not stop the worker from being released."""
+        try:
+            notifier, row = getattr(self.kit, "notifier", None), self.tasks.get(task_id)
+            if notifier and row:
+                notifier.task_finished(task_id, row[6] or row[2][:50], status, result[:150], seconds)
+        except Exception:   # noqa: BLE001
+            log.warning("could not notify about task %s", task_id)
+
     def _work(self, task_id, role, task, planned):
-        hive, status, who = self.kit.hive, "done", "worker"
+        hive, status, who, started = self.kit.hive, "done", "worker", time.monotonic()
         try:
             try:
                 if not planned:
@@ -80,5 +90,6 @@ class Dispatcher:
             log.warning("takeover of task %s failed: %s", task_id, err)
             status, result = "failed", f"nobody could finish it: {err}"
         self.tasks.finish(task_id, status, result, who)
+        self._notify(task_id, status, result, time.monotonic() - started)
         hive.leave(task_id)
         self._release()

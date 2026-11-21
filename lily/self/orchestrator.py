@@ -8,6 +8,7 @@ from lily.self.config import SelfConfig
 from lily.self.digest import Digest
 from lily.self.dispatcher import Dispatcher
 from lily.self.hive_mind import HiveMind
+from lily.self.notifier import Notifier
 from lily.self.roles import Roles
 from lily.self.router import ModelRouter
 from lily.self.staging import Staging
@@ -33,7 +34,8 @@ class SelfOrchestrator:
         self.memory = ChatMemory(data_dir / "chat_memory.db")
         self.tasks = TaskLog(data_dir / "tasks.db")
         self.steps = StepLog(data_dir / "tasks.db")
-        self.hive = HiveMind()
+        self.notifier = Notifier(cfg.notify["enabled"], cfg.notify["after_seconds"])
+        self.hive = HiveMind(self.notifier.approval)
         self.roles = Roles(cfg, data_dir)
         self.models = ModelRouter(cfg)
         self.digest = Digest(self.memory, self.models, cfg.limits)
