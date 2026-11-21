@@ -373,9 +373,25 @@ record into a branch that does not fit: leave it unclassified, or use `unknown/.
     `study/literature` inside `study/arts-literature`). It is drawn under that
     branch and counts toward it.
 
+**Automatic filing.** After every chat Lily also looks for the **names** of the
+categories from the third level down (`optics`, `genetics`, `banking`...). A name
+in your message counts 2 and in her answer 1, and a category needs 2, so "explain
+optics" is filed under `study/science/physics/optics`, while one passing mention
+in an answer is not. Code is ignored and at most 6 categories are filed per chat.
+It matches names only, so it prefers missing a chat to filing it wrongly. These
+labels show as `auto:tree`; your own labels always win and are never touched.
+`config/taxonomy_auto.toml` holds the settings: the most labels per chat, a
+`skip` list of names too common to file on their own ("model", "stars", "war"),
+and a `[words]` table of extra words (`dna` files under genetics). Run
+`/taxonomy scan` after editing it or the tree, to redo every stored chat.
+
 Commands:
 
 - `/taxonomy` shows the tree with counts.
+- `/taxonomy about <path>` shows what a category means and what is inside it
+  (for example `/taxonomy about study/science/physics`).
+- `/taxonomy find <word>` shows where a word belongs in the tree (for example
+  `/taxonomy find lenses`).
 - `/taxonomy add <path> [description]` and `/taxonomy remove <path>` grow or
   trim the tree (only categories you added, and only when empty).
 - `/taxonomy label <kind> <path> <ref>` and `/taxonomy unlabel <kind> <path|all> <ref>`.
@@ -383,7 +399,8 @@ Commands:
 - `/taxonomy show [all] <path> [path...]` filters records (any of the paths, or `all`).
 - `/taxonomy unclassified [kind]` lists records with no label (default `run`).
 - `/taxonomy search <path> <question>` searches only the notes filed there.
-- `/taxonomy scan` re-files stored chats from the older taxonomies.
+- `/taxonomy scan` redoes the automatic labels of every stored chat (the older
+  taxonomies and the category names).
 
 New top-level categories are added only in `config/taxonomy.toml`.
 
@@ -410,7 +427,7 @@ you -> ui -> main orchestrator -> agent loop
 
 ```
 main.py            entry point
-config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, taxonomy.toml, system_prompt.txt
+config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, taxonomy.toml, taxonomy_auto.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
 scripts/           setup_termux.sh (first install), update.sh (update from GitHub)
 lily/              orchestrator, agent_loop, router, state, bootstrap
@@ -421,7 +438,7 @@ lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_s
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
 lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding and entity taxonomies
-lily/memory/taxonomy/  universal taxonomy: paths, records, tree (branches, older ids), label store, legacy bridge, report, service
+lily/memory/taxonomy/  universal taxonomy: paths, records, tree (branches, older ids), label store, legacy bridge, automatic filing, browse, report, service
 lily/ui/           terminal loop, rich renderer, slash commands (commands_*.py: one file per command group)
 lily/utils/        logger, errors, paths
 tests/             run: python -m unittest discover -s tests -t .
