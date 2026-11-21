@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     done_by TEXT DEFAULT '', result TEXT DEFAULT '', started REAL, ended REAL, seen INTEGER DEFAULT 0
 );
 """
-COLUMNS = "id, role, task, status, done_by, result"
+COLUMNS = "id, role, task, status, done_by, result, title"
 
 
 class TaskLog:
@@ -17,6 +17,10 @@ class TaskLog:
         self.path = str(path)
         with closing(sqlite3.connect(self.path)) as db:
             db.executescript(SCHEMA)
+            try:
+                db.execute("ALTER TABLE tasks ADD COLUMN title TEXT DEFAULT ''")   # older files lack it
+            except sqlite3.OperationalError:
+                pass   # the column is already there
         # A task still 'running' belongs to a Lily that was closed: it can never finish now.
         self._run("UPDATE tasks SET status='failed', result='interrupted when Lily closed' WHERE status='running'")
 
@@ -30,6 +34,9 @@ class TaskLog:
     def start(self, role, task):
         sql = "INSERT INTO tasks (role, task, status, started) VALUES (?, ?, 'running', ?)"
         return self._run(sql, (role, task, time.time()))[0]
+
+    def rename(self, task_id, title):
+        self._run("UPDATE tasks SET title=? WHERE id=?", (title, task_id))
 
     def get(self, task_id):
         rows = self._run(f"SELECT {COLUMNS} FROM tasks WHERE id=?", (task_id,))[1]
@@ -59,5 +66,6 @@ class TaskLog:
 
     @staticmethod
     def line(row):
-        task_id, role, task, status, done_by, result = row
-        return f"#{task_id} {role} ({status}, by {done_by or 'nobody'}): {task[:60]} -> {result[:300]}"
+        task_id, role, task, status, done_by, result, *more = row
+        label = (more[0] if more and more[0] else task[:60])   # the short title when the namer wrote one
+        return f"#{task_id} {role} ({status}, by {done_by or 'nobody'}): {label} -> {result[:300]}"

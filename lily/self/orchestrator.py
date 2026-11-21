@@ -8,6 +8,7 @@ from lily.self.config import SelfConfig
 from lily.self.digest import Digest
 from lily.self.dispatcher import Dispatcher
 from lily.self.hive_mind import HiveMind
+from lily.self.roles import Roles
 from lily.self.router import ModelRouter
 from lily.self.staging import Staging
 from lily.self.step_log import StepLog
@@ -33,6 +34,7 @@ class SelfOrchestrator:
         self.tasks = TaskLog(data_dir / "tasks.db")
         self.steps = StepLog(data_dir / "tasks.db")
         self.hive = HiveMind()
+        self.roles = Roles(cfg, data_dir)
         self.models = ModelRouter(cfg)
         self.digest = Digest(self.memory, self.models, cfg.limits)
         self.staging = Staging(data_dir / "staging") if cfg.staging["enabled"] else None

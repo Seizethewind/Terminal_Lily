@@ -1,11 +1,13 @@
 """Runs workers in the background, and hands a failed task to Lily to finish."""
 import threading
 
+from lily.self import namer
 from lily.self.step_runner import StepRunner
 from lily.utils.errors import LilyError
 from lily.utils.logger import get_logger
 
 log = get_logger("self.dispatch")
+NAME_MIN = 50   # shorter tasks are their own title
 
 
 class Dispatcher:
@@ -50,6 +52,16 @@ class Dispatcher:
     def _launch(self, task_id, role, task, planned):
         self.kit.hive.join(task_id, role)
         threading.Thread(target=self._work, args=(task_id, role, task, planned), daemon=True).start()
+        if len(task) > NAME_MIN and not planned:
+            threading.Thread(target=self._name, args=(task_id, task), daemon=True).start()
+
+    def _name(self, task_id, task):
+        try:
+            title = namer.make_title(self.kit.models, task)
+            if title:
+                self.tasks.rename(task_id, title)
+        except Exception:   # noqa: BLE001 - a missing title is never worth an error
+            log.warning("could not name task %s", task_id)
 
     def _work(self, task_id, role, task, planned):
         hive, status, who = self.kit.hive, "done", "worker"
