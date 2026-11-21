@@ -64,6 +64,16 @@ class StudyAreaTests(unittest.TestCase):
                 self.assertGreaterEqual(len(topics), 3, area)
                 self.assertFalse(any(self.tree.children(topic) for topic in topics), area)
 
+    def test_some_topics_have_sub_topics_and_nothing_goes_past_the_fifth_level(self):
+        deep = [path for path in self.tree.nodes if path.count("/") == 4]
+        self.assertGreaterEqual(len(deep), 200)
+        for path in deep:
+            parent = path.rsplit("/", 1)[0]
+            self.assertEqual(parent.count("/"), 3, path)
+            self.assertIn(parent, self.tree.nodes)
+            self.assertEqual(self.tree.children(path), [], path)
+        self.assertIn("study/science/physics/optics/laser", self.tree.nodes)
+
 
 if __name__ == "__main__":
     unittest.main()
