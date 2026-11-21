@@ -20,6 +20,7 @@ DEFAULTS = {
     "personality": {"text": ""},
     "staging": {"enabled": True},   # writes wait for one apply instead of landing at once
     "autonomy": {"level": "basic"},   # the level on a first start; /auto changes it and it is remembered
+    "notify": {"enabled": True, "after_seconds": 30},   # phone notification for slow or failed tasks (needs Termux:API)
 }
 
 

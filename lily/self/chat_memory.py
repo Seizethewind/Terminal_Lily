@@ -48,6 +48,16 @@ class ChatMemory:
         rows = self._run("SELECT text FROM facts ORDER BY id DESC LIMIT ?", (limit,))
         return [row[0] for row in rows][::-1]
 
+    def numbered_facts(self, limit=100):
+        """(number, text) of the saved facts, oldest first. The number is what /unremember takes."""
+        return self._run("SELECT id, text FROM facts ORDER BY id DESC LIMIT ?", (limit,))[::-1]
+
+    def forget_fact(self, fact_id):
+        """Remove one fact. Returns False when there is no such number."""
+        found = self._run("SELECT COUNT(*) FROM facts WHERE id = ?", (fact_id,))[0][0]
+        self._run("DELETE FROM facts WHERE id = ?", (fact_id,))
+        return bool(found)
+
     def summary(self):
         """(text, id of the last turn it covers); ('', 0) before the first summary."""
         rows = self._run("SELECT text, upto FROM summary WHERE id = 1")

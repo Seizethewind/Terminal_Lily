@@ -5,8 +5,9 @@ KEEP = 20   # notes kept per task
 
 
 class HiveMind:
-    def __init__(self):
+    def __init__(self, on_request=None):
         self.lock = threading.Lock()
+        self.on_request = on_request   # told when a worker starts waiting for the user (a notification)
         self.workers = {}     # task id -> {"role", "state", "note"}
         self.notes = {}       # task id -> short lines about what was done (Lily reads them on a takeover)
         self.approvals = {}   # approval key -> {"task", "text", "answer", "event"}
@@ -46,6 +47,11 @@ class HiveMind:
             key = self._next
             self.approvals[key] = {"task": task_id, "text": text, "answer": None, "event": event}
         self.note(task_id, f"waiting for approval: {text}")
+        if self.on_request:
+            try:
+                self.on_request(task_id, text)
+            except Exception:   # noqa: BLE001 - a failed notification must never block an approval
+                pass
         event.wait(wait)
         with self.lock:
             item = self.approvals.pop(key)
