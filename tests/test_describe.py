@@ -1,6 +1,6 @@
 import unittest
 
-from lily.tools.describe import LIMIT, describe
+from lily.tools.describe import describe
 from lily.tools.permissions import Permissions
 
 
@@ -41,10 +41,10 @@ class DescribeTests(unittest.TestCase):
         self.assertEqual(what, "use the tool 'lilyai__find'")
         self.assertEqual(details, ["query: cats", "limit: 3"])
 
-    def test_missing_arguments_do_not_crash_and_long_ones_are_cut(self):
+    def test_missing_arguments_do_not_crash_and_long_ones_are_never_cut(self):
         self.assertEqual(describe("shell", {}), ("run a command on your phone", []))
-        _, (line,) = describe("shell", {"command": "x" * (LIMIT + 50)})
-        self.assertTrue(line.endswith("(50 more characters)"))
+        command = "x" * 500
+        self.assertEqual(describe("shell", {"command": command})[1], [command])
 
     def test_the_question_has_no_json_in_it(self):
         lily = Lily()
