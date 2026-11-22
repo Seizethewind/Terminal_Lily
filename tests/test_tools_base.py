@@ -82,10 +82,10 @@ class PermissionsTests(unittest.TestCase):
     def test_no_means_no(self):
         self.assertFalse(Permissions(Lily(False)).allow(Echo(None), {}))
 
-    def test_very_long_arguments_are_shortened(self):
+    def test_very_long_arguments_are_shown_in_full(self):
         lily = Lily(True)
         Permissions(lily).allow(Echo(None), {"text": "x" * 5000})
-        self.assertLess(len(lily.asked[0]), 1200)
+        self.assertIn("x" * 5000, lily.asked[0])   # a 'y' must cover everything that will run
 
 
 if __name__ == "__main__":
