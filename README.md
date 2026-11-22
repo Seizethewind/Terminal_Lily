@@ -298,7 +298,7 @@ The four top-level categories (`config/taxonomy.toml`):
 Each has broad second-level branches (below). **Study** also has a third level
 (the main areas inside each branch, listed after the table) and a fourth level
 (the main topics inside each area). Entity, geography and nature stop at the
-second level for now: the deeper knowledge about them lives in Study, under
+second level: the deeper knowledge about them lives in Study, under
 `study/entity`, `study/geography` and `study/nature` (areas listed below). Every
 level grows on demand.
 Paths are lowercase words joined by `/`, up to 6 levels, for example
@@ -334,8 +334,7 @@ Study areas (third level, all in `config/taxonomy.toml` with definitions):
 | **geography** (knowledge about places) | physical-geography, human-geography, regional-geography, cartography, gis-remote-sensing, geopolitics, urban-geography, economic-geography, place-names, navigation, spatial-analysis |
 | **nature** (knowledge about nature) | ecosystem-studies, habitat-studies, climate-zones, weather-watching, natural-phenomena, natural-processes, geological-features, natural-resources, environmental-monitoring, biodiversity-studies, natural-history, field-observation |
 
-Study topics (fourth level): every area above (except the entity, geography and nature
-areas, which stop at the third level for now) has 3 to 8 topics, about 500 in
+Study topics (fourth level): every area above has 3 to 8 topics, about 700 in
 all, each with its own definition in `config/taxonomy.toml`. For example
 `study/science/physics` holds mechanics, thermodynamics, electromagnetism,
 optics, quantum-physics, relativity and nuclear-physics, and
