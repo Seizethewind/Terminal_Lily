@@ -296,8 +296,9 @@ The four top-level categories (`config/taxonomy.toml`):
 - **study**: knowledge, disciplines, discoveries, history, concepts and research
 
 Each has broad second-level branches (below). **Study** also has a third level
-(the main areas inside each branch, listed after the table) and a fourth level
-(the main topics inside each area). Entity, geography and nature stop at the
+(the main areas inside each branch, listed after the table), a fourth level
+(the main topics inside each area) and, for some busy topics, a fifth level of
+sub-topics. Entity, geography and nature stop at the
 second level: the deeper knowledge about them lives in Study, under
 `study/entity`, `study/geography` and `study/nature` (areas listed below). Every
 level grows on demand.
@@ -340,8 +341,14 @@ all, each with its own definition in `config/taxonomy.toml`. For example
 optics, quantum-physics, relativity and nuclear-physics, and
 `study/religion-belief/world-religion` holds christianity, islam, hinduism,
 buddhism, judaism, sikhism, folk-indigenous-religion and new-religious-movement.
-Run `/taxonomy show study/science/physics` for one area. Nothing goes deeper
-than the fourth level by default.
+Run `/taxonomy show study/science/physics` for one area.
+
+Study sub-topics (fifth level): about 50 of the busiest topics are split once
+more, about 250 sub-topics in all. For example `study/science/physics/optics`
+holds geometric-optics, wave-optics, lens-mirror, light-and-color and laser, and
+`study/religion-belief/world-religion/buddhism` holds theravada, mahayana,
+vajrayana, zen and four-noble-truths. Run `/taxonomy about <topic>` to see
+which topics have sub-topics. Nothing goes deeper than the fifth level by default.
 
 `literature`, `computing` and `programming` keep their own ids and sit inside
 arts-literature and technology (see "Older ids are kept"); their areas

@@ -24,7 +24,7 @@ class BrowseTests(unittest.TestCase):
         store.label(self.db, "run", "1", "study/science/physics/optics", "user")
         self.assertIn("optics  1 record(s)", browse.about(self.tree, self.db, "study/science/physics"))
         self.assertIn("older ids: nature/animal", browse.about(self.tree, self.db, "nature/animal"))
-        self.assertIn("(nothing inside yet)", browse.about(self.tree, self.db, "study/science/physics/optics"))
+        self.assertIn("(nothing inside yet)", browse.about(self.tree, self.db, "study/science/physics/relativity"))
         with self.assertRaisesRegex(LilyError, "not in the taxonomy"):
             browse.about(self.tree, self.db, "study/nothing")
 
