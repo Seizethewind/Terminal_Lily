@@ -1,8 +1,11 @@
 """The /taxonomy command: the universal data taxonomy (organize and filter what Lily stored)."""
+from lily.memory.taxonomy import browse
 from lily.ui.commands import command, layer
 
 USAGE = """Usage:
 /taxonomy                              the tree with record counts
+/taxonomy about <path>                 what a category means and what is inside it
+/taxonomy find <word>                  where a word belongs in the tree
 /taxonomy add <path> [description]     new subcategory, e.g. study/history
 /taxonomy remove <path>                remove a subcategory you added (it must be empty)
 /taxonomy label <kind> <path> <ref>    file a record, e.g. note study/history /sd/ww2.md
@@ -11,7 +14,7 @@ USAGE = """Usage:
 /taxonomy show [all] <path> [path...]  records filed there (all = in every path)
 /taxonomy unclassified [kind]          records with no label yet (default: run)
 /taxonomy search <path> <question>     search only the notes filed there
-/taxonomy scan                         redo the automatic labels of every chat
+/taxonomy scan                         redo the automatic labels of every chat (also after editing config/taxonomy_auto.toml)
 kinds: run (ref = chat number), note (ref = source shown by /notes)"""
 
 
@@ -27,6 +30,10 @@ def _taxonomy(lily, args):
         return tax.report()
     if action == "scan":
         return tax.scan()
+    if action == "about" and rest:
+        return browse.about(tax.tree, tax.db, rest[0])
+    if action == "find" and rest:
+        return browse.find(tax.tree, " ".join(rest))
     if action == "add" and rest:
         return tax.add(rest[0], " ".join(rest[1:]))
     if action == "remove" and rest:

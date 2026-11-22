@@ -1,0 +1,31 @@
+# Automatic filing of chats by what they talk about (see lily/memory/taxonomy/autolabel.py).
+#
+# After each chat, Lily looks for the NAMES of the categories in config/taxonomy.toml, from the
+# third level down (optics, genetics, cartography...). A name found in your message counts 2,
+# in her answer 1, and a category needs 2 to be filed. Code is ignored. At most `max_labels` per chat.
+# Labels made this way are marked "auto:tree"; your own labels always win and are never touched.
+#
+# It matches names only, so it prefers missing a chat to filing it wrongly.
+
+max_labels = 6
+
+# Names too common in everyday or programming talk to file on their own ("a model", "the stars").
+# Remove one from this list if you want it filed, or add your own.
+skip = [
+    "model", "inference", "distribution", "vector", "matrix", "sets", "limits", "sampling", "sensor",
+    "circuit", "journal", "conference", "citation", "feedback", "strategy", "operations", "leadership",
+    "career", "workplace", "exam", "wage", "survey", "identity", "knowledge", "truth", "existence",
+    "motivation", "composition", "instrument", "people", "objects", "groups", "materials", "plants",
+    "classification", "navigation", "trend", "sport", "gaming", "fashion", "legend", "portfolio",
+    "stars", "war", "rail", "wireless", "modern", "ancient", "contemporary", "commentary", "doctrine",
+    "interpretation", "interpreting", "injury", "lecture", "grading", "satellite", "prototype",
+]
+
+# Extra words for names that are written differently in everyday talk: "word" = "category path".
+[words]
+gis = "study/geography/gis-remote-sensing"
+"remote sensing" = "study/geography/gis-remote-sensing"
+"quantum mechanics" = "study/science/physics/quantum-physics"
+dna = "study/science/biology/genetics"
+"black hole" = "study/science/astronomy/stars"
+"global warming" = "study/science/environmental-science/climate-change"

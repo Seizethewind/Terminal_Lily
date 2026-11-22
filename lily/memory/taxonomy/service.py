@@ -1,5 +1,5 @@
 """The universal data taxonomy: label any stored record with one or more categories."""
-from lily.memory.taxonomy import legacy, records, report, store
+from lily.memory.taxonomy import autolabel, legacy, records, report, store
 from lily.memory.taxonomy.paths import ancestors, clean
 from lily.memory.taxonomy.tree import Tree, load_config
 from lily.utils.errors import LilyError
@@ -8,9 +8,10 @@ PREVIEW = 60   # characters of a chat shown when listing unclassified runs
 
 
 class Taxonomy:
-    def __init__(self, get_db, sources=lambda: (), config=None):
-        """`sources` lists the note sources (from RAG). `config` is load_config()'s result (for tests)."""
-        self._get_db, self._config, self._tree = get_db, config, None
+    def __init__(self, get_db, sources=lambda: (), config=None, auto=None):
+        """`sources` lists the note sources (from RAG). `config` and `auto` are load_config()'s and
+        autolabel.load_settings()'s results (for tests)."""
+        self._get_db, self._config, self._tree, self.auto = get_db, config, None, auto
         # A kind of record is a name plus a function that lists its records as [(ref, preview)].
         # Anything can be labelled without being listed here; listing only powers "unclassified".
         self.kinds = {"run": self._runs, "note": lambda: [(source, "") for source in sources()]}
@@ -88,12 +89,13 @@ class Taxonomy:
         return [(ref, text) for ref, text in self.kinds[kind]() if ref not in done]
 
     def index_run(self, run_id, user_text="", answer=""):
-        """Called after every chat: label it from what the older taxonomies found."""
-        return legacy.label_run(self, run_id)
+        """Called after every chat: label it from what the older taxonomies found and the names it uses."""
+        return legacy.label_run(self, run_id) + autolabel.label_run(self, run_id, user_text, answer)
 
     def scan(self):
-        runs = [row[0] for row in self.db.rows("SELECT id FROM runs ORDER BY id")]
-        total = sum(legacy.label_run(self, run) for run in runs)
+        runs = self.db.rows("SELECT id, user_text, answer FROM runs ORDER BY id")
+        matcher = autolabel.Matcher(self.tree, self.auto)
+        total = sum(legacy.label_run(self, run[0]) + autolabel.label_run(self, *run, matcher) for run in runs)
         return f"scanned {len(runs)} chat(s), made {total} automatic label(s)"
 
     def report(self):
