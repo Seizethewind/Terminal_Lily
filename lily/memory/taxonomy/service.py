@@ -94,7 +94,7 @@ class Taxonomy:
 
     def scan(self):
         runs = self.db.rows("SELECT id, user_text, answer FROM runs ORDER BY id")
-        matcher = autolabel.Matcher(self.tree, self.auto)
+        matcher = autolabel.make_matcher(self)
         total = sum(legacy.label_run(self, run[0]) + autolabel.label_run(self, *run, matcher) for run in runs)
         return f"scanned {len(runs)} chat(s), made {total} automatic label(s)"
 

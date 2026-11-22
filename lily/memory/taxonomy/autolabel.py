@@ -2,6 +2,7 @@
 import tomllib
 from collections import Counter
 
+from lily.memory import dict_store
 from lily.memory.entity_find import build, find
 from lily.memory.taxonomy import store
 from lily.utils.errors import ConfigError
@@ -28,14 +29,14 @@ def load_settings(path=PATH):
 
 
 class Matcher:
-    def __init__(self, tree, settings=None):
+    def __init__(self, tree, settings=None, terms=None):
         skip, words, self.limit = settings or load_settings()
         self.phrases = {}   # lowercase word or phrase -> the paths it points at
         for path in tree.nodes:
             name = path.rpartition("/")[2]
             if path.count("/") >= MIN_DEPTH and name not in skip:
                 self.phrases.setdefault(name.replace("-", " "), set()).add(path)
-        for word, path in words.items():
+        for word, path in [*words.items(), *(terms or {}).items()]:   # `terms`: your dictionary
             if path in tree.nodes:
                 self.phrases.setdefault(word, set()).add(path)
         self.pattern = build(self.phrases)
@@ -52,10 +53,14 @@ class Matcher:
         return sorted(found, key=lambda path: (-score[path], path))[:self.limit]
 
 
+def make_matcher(tax):
+    return Matcher(tax.tree, tax.auto, dict_store.phrases(tax.db))
+
+
 def label_run(tax, run_id, user_text="", answer="", matcher=None):
     """Replace the automatic labels of this kind on one chat. Your own labels are never touched."""
     ref = str(run_id)
-    matcher = matcher or Matcher(tax.tree, tax.auto)
+    matcher = matcher or make_matcher(tax)
     store.unlabel(tax.db, "run", ref, source=SOURCE)
     paths = matcher.paths(user_text, answer)
     for path in paths:

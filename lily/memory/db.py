@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS taxonomy_labels (
     id INTEGER PRIMARY KEY, kind TEXT, ref TEXT, path TEXT, source TEXT, ts TEXT,
     UNIQUE (kind, ref, path));
 CREATE INDEX IF NOT EXISTS taxonomy_labels_path ON taxonomy_labels(path);
+CREATE TABLE IF NOT EXISTS dictionary (
+    term TEXT PRIMARY KEY, label TEXT, meaning TEXT, path TEXT, aliases TEXT, ts TEXT);
 """
 
 
