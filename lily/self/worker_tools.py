@@ -79,7 +79,7 @@ class WorkerTools:
         if target is not None and policy.covered(target, self.grants):
             return True
         what, details = describe(tool.name, args)
-        text = what + (f": {tidy.short(details[0])}" if details else "")
+        text = what + (": " + " | ".join(tidy.full(detail) for detail in details) if details else "")   # all of it, uncut
         if target is not None:
             text += " (also covers other files in that folder for this task)"
         yes = self.hive.request(self.task_id, text, self.wait)

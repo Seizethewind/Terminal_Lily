@@ -19,14 +19,31 @@ RISKY = {
 GIT_OK = {"status", "log", "diff", "show", "add", "commit", "init", "branch"}
 
 
+def outside(path):
+    """True if `path`, as Lily would open it (symlinks followed), is outside the workplace."""
+    resolved = in_workplace(path)
+    return resolved != workplace() and workplace() not in resolved.parents
+
+
 def _outside(word):
     """True if a path-looking word points outside the workplace."""
     if not word or word.startswith("-"):
         return False
     if not (word.startswith(("/", "~")) or ".." in word.split("/")):
         return False
-    path = in_workplace(word)
-    return path != workplace() and workplace() not in path.parents
+    return outside(word)
+
+
+def reaches_outside(command):
+    """True if any word of a command points outside the workplace, even for a plain read."""
+    for part in re.split(r"[;&|\n]+", str(command)):
+        try:
+            words = shlex.split(part)
+        except ValueError:
+            return True
+        if any(_outside(word.lstrip("<>")) for word in words[1:]):
+            return True
+    return False
 
 
 def _risky(words):

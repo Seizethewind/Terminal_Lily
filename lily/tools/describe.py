@@ -1,6 +1,7 @@
-"""Plain-English wording for the 'allow?' question, so you never read raw JSON."""
-LIMIT = 400   # characters of any one detail that are shown
+"""Plain-English wording for the 'allow?' question, so you never read raw JSON.
 
+Nothing is cut here: what the user approves is what runs.
+"""
 FIXED = {   # tool name -> (what Lily wants to do, the argument that says what exactly)
     "shell": ("run a command on your phone", "command"),
     "read_file": ("read a file", "path"),
@@ -14,24 +15,19 @@ TERMUX = {
 }
 
 
-def _cut(value):
-    text = str(value)
-    return text if len(text) <= LIMIT else f"{text[:LIMIT]}... ({len(text) - LIMIT} more characters)"
-
-
 def describe(name, args):
     """Return (what Lily wants to do, [detail lines])."""
     if name in FIXED:
         what, key = FIXED[name]
-        return what, [_cut(args[key])] if key in args else []
+        return what, [str(args[key])] if key in args else []
     if name == "write_file":
         what = "add text to the end of a file" if args.get("append") else "write to a file"
         size = len(str(args.get("content", "")))
-        return what, [_cut(args.get("path", "?")), f"({size} characters of text)"]
+        return what, [str(args.get("path", "?")), f"({size} characters of text)"]
     if name == "edit_file":
         size = (len(str(args.get("old", ""))), len(str(args.get("new", ""))))
-        return "change part of a file", [_cut(args.get("path", "?")), f"(replace {size[0]} characters with {size[1]})"]
+        return "change part of a file", [str(args.get("path", "?")), f"(replace {size[0]} characters with {size[1]})"]
     if name == "termux_api":
-        details = [_cut(args[key]) for key in ("title", "text") if args.get(key)]
+        details = [str(args[key]) for key in ("title", "text") if args.get(key)]
         return TERMUX.get(args.get("action"), "use your phone"), details
-    return f"use the tool '{name}'", [f"{key}: {_cut(value)}" for key, value in args.items()]
+    return f"use the tool '{name}'", [f"{key}: {value}" for key, value in args.items()]
