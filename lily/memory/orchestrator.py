@@ -2,6 +2,7 @@
 from lily.memory import export_dataset, feedback, history, lessons, profile_hints, run_log, summarizer
 from lily.memory.code_taxonomy import CodeTaxonomy
 from lily.memory.db import Database
+from lily.memory.dictionary import Dictionary
 from lily.memory.entity_taxonomy import EntityTaxonomy
 from lily.memory.taxonomy.service import Taxonomy
 from lily.utils.errors import LilyError
@@ -20,6 +21,7 @@ class MemoryOrchestrator:
         self.code = CodeTaxonomy(lambda: self.db)   # the coding taxonomy
         self.entities = EntityTaxonomy(lambda: self.db)   # entity / location / object
         self.taxonomy = Taxonomy(lambda: self.db, self._note_sources)   # universal data taxonomy
+        self.dictionary = Dictionary(lambda: self.db, self.taxonomy)   # your own words and meanings
 
     @property
     def db(self):
@@ -39,9 +41,11 @@ class MemoryOrchestrator:
             raise LilyError(f"the {name} layer is not installed")
         return sub
 
-    def run(self, state, record=None, **kwargs):
-        """Store one finished turn. `record` comes from the main orchestrator."""
+    def run(self, state, record=None, query="", **kwargs):
+        """With a `record` (from the main orchestrator): store one finished turn.
+        With a `query`: add the dictionary entries that message uses to the prompt."""
         if record is None:
+            state.context.extend(self.dictionary.context(query) if query else [])
             return
         llm = self.lily.router.get("llm")
         record.setdefault("profile", getattr(llm, "last_profile", ""))

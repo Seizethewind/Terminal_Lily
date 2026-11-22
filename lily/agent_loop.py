@@ -4,7 +4,7 @@ from lily.utils.logger import get_logger
 
 log = get_logger("agent")
 NO_LLM = "My LLM layer isn't installed yet, so I can't answer. It arrives in the next update."
-RECALL = ("rag", "self")   # layers that add context before the model thinks
+RECALL = ("rag", "self", "memory")   # layers that add context before the model thinks
 
 
 class AgentLoop:
@@ -42,7 +42,7 @@ class AgentLoop:
                 continue
             try:
                 sub.run(state, query=query)
-            except LilyError as err:
+            except Exception as err:   # noqa: BLE001 - extra context is a bonus; it must never break the chat
                 log.warning("%s failed: %s", name, err)
 
     def _act(self, target, state, call):

@@ -1,0 +1,79 @@
+# Starter words for /dict load. Words you already have are never changed or replaced.
+# term = the word, meaning = what it is, path = where it files in the taxonomy (optional), aliases = other names.
+[[entry]]
+term = "Naruto"
+meaning = "Japanese ninja manga by Masashi Kishimoto, also a long anime series"
+path = "study/entertainment/anime/anime-demographic/shonen"
+
+[[entry]]
+term = "Dragon Ball"
+meaning = "Japanese martial-arts adventure manga by Akira Toriyama, also anime"
+path = "study/entertainment/anime/anime-demographic/shonen"
+
+[[entry]]
+term = "Fullmetal Alchemist"
+meaning = "Manga by Hiromu Arakawa about two brothers and alchemy, adapted to anime twice"
+path = "study/entertainment/anime/anime-demographic/shonen"
+aliases = ["fma"]
+
+[[entry]]
+term = "Studio Ghibli"
+meaning = "Japanese animation studio founded in 1985 by Hayao Miyazaki, Isao Takahata and Toshio Suzuki"
+path = "study/entertainment/anime/anime-studio"
+
+[[entry]]
+term = "Hatsune Miku"
+meaning = "Virtual singer voiced by Crypton Future Media's voice software, first released in 2007"
+path = "study/entertainment/anime-voice-music/vocal-synth/virtual-singer-character"
+
+[[entry]]
+term = "Elden Ring"
+meaning = "Open-world action role-playing game by FromSoftware, released in 2022"
+path = "study/entertainment/game-genres/action-games/soulslike"
+
+[[entry]]
+term = "Dark Souls"
+meaning = "Hard action role-playing game series by FromSoftware that named the soulslike style"
+path = "study/entertainment/game-genres/action-games/soulslike"
+
+[[entry]]
+term = "Minecraft"
+meaning = "Sandbox game by Mojang about placing and breaking blocks, building and surviving"
+path = "study/entertainment/more-game-genres/sandbox-games/block-building"
+
+[[entry]]
+term = "Genshin Impact"
+meaning = "Open-world action role-playing game by HoYoverse where characters are won through gacha draws"
+path = "study/entertainment/more-game-genres/gacha-games/character-gacha"
+
+[[entry]]
+term = "Pokemon"
+meaning = "Nintendo and Game Freak series of monster-collecting role-playing games, also anime and cards"
+path = "study/entertainment/game-genres/rpg/jrpg"
+aliases = ["pokémon"]
+
+[[entry]]
+term = "Final Fantasy"
+meaning = "Square Enix series of Japanese role-playing games, each with its own world and story"
+path = "study/entertainment/game-genres/rpg/jrpg"
+
+[[entry]]
+term = "Mobile Legends"
+meaning = "Team battle game for phones by Moonton, where two sides of heroes fight to destroy the enemy base"
+path = "study/entertainment/game-genres/strategy-games/moba"
+aliases = ["mlbb"]
+
+[[entry]]
+term = "League of Legends"
+meaning = "Team battle game by Riot Games, a leading esports title since 2009"
+path = "study/entertainment/game-genres/strategy-games/moba"
+
+[[entry]]
+term = "Valorant"
+meaning = "Five-versus-five tactical hero shooter by Riot Games, released in 2020"
+path = "study/entertainment/game-genres/shooter-games/hero-shooter"
+
+[[entry]]
+term = "Stardew Valley"
+meaning = "Farming and life game by ConcernedApe about running a farm and joining a village"
+path = "study/entertainment/game-genres/simulation-games/farming-simulation"
