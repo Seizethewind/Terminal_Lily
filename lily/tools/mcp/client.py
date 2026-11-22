@@ -3,12 +3,17 @@
 It does not support the older "HTTP + SSE" transport.
 """
 import json
+import threading
 import urllib.error
 import urllib.request
 
 from lily.utils.errors import ToolError
 
 PROTOCOL = "2025-06-18"
+
+
+class SessionExpired(ToolError):
+    """The server forgot our session (HTTP 404): a new one must be started."""
 
 
 def _sse_messages(body):
@@ -36,11 +41,13 @@ class McpClient:
         self.url, self.token, self.timeout = url, token, timeout
         self.session = ""
         self._next_id = 0
+        self._lock = threading.RLock()   # workers share one client: one request at a time keeps ids and session straight
 
     def connect(self):
         info = {"name": "Terminal_Lily", "version": "0.1"}
-        self._rpc("initialize", {"protocolVersion": PROTOCOL, "capabilities": {}, "clientInfo": info})
-        self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        with self._lock:
+            self._rpc("initialize", {"protocolVersion": PROTOCOL, "capabilities": {}, "clientInfo": info})
+            self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
 
     def list_tools(self):
         tools, cursor = [], None
@@ -60,6 +67,16 @@ class McpClient:
         return text or "(no text output)"
 
     def _rpc(self, method, params):
+        with self._lock:
+            try:
+                return self._send(method, params)
+            except SessionExpired:
+                if method == "initialize":
+                    raise
+                self.connect()   # the server dropped our session: start a new one, then try once more
+                return self._send(method, params)
+
+    def _send(self, method, params):
         self._next_id += 1
         message = {"jsonrpc": "2.0", "id": self._next_id, "method": method, "params": params}
         body, kind = self._post(message)
@@ -90,6 +107,9 @@ class McpClient:
                 self.session = resp.headers.get("Mcp-Session-Id") or self.session
                 return resp.read().decode("utf-8"), resp.headers.get_content_type()
         except urllib.error.HTTPError as err:   # must come before URLError
+            if err.code == 404 and self.session:
+                self.session = ""
+                raise SessionExpired("the MCP session expired") from err
             raise ToolError(f"the MCP server answered HTTP {err.code}") from err
         except (urllib.error.URLError, OSError) as err:
             raise ToolError(f"cannot reach the MCP server: {err}") from err

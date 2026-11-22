@@ -35,6 +35,10 @@ def _loose(text, old, new):
     if len(hits) > 1:
         raise ToolError(f"the old text matches {len(hits)} places when spaces are ignored; add more surrounding lines")
     start = hits[0]
+    if any("\t" in line[:_indent(line)] for line in lines[start:start + len(want)]):
+        # shift() only knows spaces: guessing would mix tabs and spaces (Makefile, Go)
+        raise ToolError("those lines are indented with tabs, so the edit cannot be matched loosely. "
+                        "Read the file again and copy the lines exactly, tabs included.")
     delta = _indent(lines[start]) - _indent(given[0])
     fresh = [_shift(line, delta) for line in new.strip("\n").split("\n")] if new.strip("\n") else []
     return "\n".join(lines[:start] + fresh + lines[start + len(want):]), "ignoring spaces"
