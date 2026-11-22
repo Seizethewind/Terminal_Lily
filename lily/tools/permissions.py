@@ -34,8 +34,8 @@ class Permissions:
 
     def _ask(self, tool, args, target):
         what, details = describe(tool.name, args)
-        lines = [tidy.short(line) for line in details]
+        lines = [tidy.full(line) for line in details]   # never cut: a 'y' covers everything shown
         if target is not None:
-            lines.append(f"(also covers other files in {tidy.short(target)} for this task)")
+            lines.append(f"(also covers other files in {tidy.full(target)} for this task)")
         question = "\n".join([f"Lily wants to {what}:", *(f"    {line}" for line in lines)])
         return bool(self.lily.confirm(question))

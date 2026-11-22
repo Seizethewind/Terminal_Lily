@@ -4,6 +4,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from lily.utils import childenv
 from lily.utils.errors import ConfigError
 from lily.utils.paths import CONFIG_DIR, DATA_DIR, ROOT
 
@@ -17,7 +18,9 @@ def load_env(path: Path = ROOT / ".env") -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+        key = key.strip()
+        childenv.HIDDEN.add(key)   # shell commands must not inherit what .env holds
+        os.environ.setdefault(key, value.strip().strip("\"'"))
 
 
 def _read_toml(path: Path) -> dict:
