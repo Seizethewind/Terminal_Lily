@@ -310,7 +310,7 @@ Paths are lowercase words joined by `/`, up to 6 levels, for example
 | **entity** (what exists or can be identified) | living, non-living, person, animal, plant, microorganism, object, material, organization, group |
 | **geography** (where, and how places relate) | continent, country-territory, administrative-region, settlement, landform, water-body, geographic-feature, location, boundary, spatial-relationship |
 | **nature** (natural systems and processes) | ecosystem, habitat, climate, weather, natural-phenomenon, natural-process, geological-system, natural-resource, environmental-condition, biodiversity |
-| **study** (human knowledge) | history, science, math, philosophy, culture, language, religion-belief, arts-literature, social-studies, political-studies, economics, medicine, technology, education, research-discovery, entity, geography, nature |
+| **study** (human knowledge) | history, science, math, philosophy, culture, language, religion-belief, arts-literature, social-studies, political-studies, economics, medicine, technology, education, research-discovery, entertainment, entity, geography, nature |
 
 Study areas (third level, all in `config/taxonomy.toml` with definitions):
 
@@ -331,11 +331,12 @@ Study areas (third level, all in `config/taxonomy.toml` with definitions):
 | **technology** | engineering, electronics, energy, manufacturing, transportation, communication, biotechnology, robotics-automation |
 | **education** | teaching-method, curriculum, learning-theory, study-skill, assessment, school-system |
 | **research-discovery** | research-method, experiment, discovery, invention, theory, publication |
+| **entertainment** (anime, games and fandom) | anime, manga, novels-webcomics, video-games, game-genres, more-game-genres, game-design, game-platforms, game-development, esports-competition, tabletop-card-games, fandom-community, storytelling-tropes, japanese-pop-culture, anime-voice-music |
 | **entity** (knowledge about things) | living-things, non-living-things, people, animals, plants, microorganisms, objects, materials, organizations, groups, classification |
 | **geography** (knowledge about places) | physical-geography, human-geography, regional-geography, cartography, gis-remote-sensing, geopolitics, urban-geography, economic-geography, place-names, navigation, spatial-analysis |
 | **nature** (knowledge about nature) | ecosystem-studies, habitat-studies, climate-zones, weather-watching, natural-phenomena, natural-processes, geological-features, natural-resources, environmental-monitoring, biodiversity-studies, natural-history, field-observation |
 
-Study topics (fourth level): every area above has 3 to 8 topics, about 700 in
+Study topics (fourth level): every area above has 3 to 8 topics, about 800 in
 all, each with its own definition in `config/taxonomy.toml`. For example
 `study/science/physics` holds mechanics, thermodynamics, electromagnetism,
 optics, quantum-physics, relativity and nuclear-physics, and
@@ -343,12 +344,17 @@ optics, quantum-physics, relativity and nuclear-physics, and
 buddhism, judaism, sikhism, folk-indigenous-religion and new-religious-movement.
 Run `/taxonomy show study/science/physics` for one area.
 
-Study sub-topics (fifth level): about 50 of the busiest topics are split once
-more, about 250 sub-topics in all. For example `study/science/physics/optics`
+Study sub-topics (fifth level): about 120 of the busiest topics are split once
+more, about 600 sub-topics in all. For example `study/science/physics/optics`
 holds geometric-optics, wave-optics, lens-mirror, light-and-color and laser, and
 `study/religion-belief/world-religion/buddhism` holds theravada, mahayana,
 vajrayana, zen and four-noble-truths. Run `/taxonomy about <topic>` to see
 which topics have sub-topics. Nothing goes deeper than the fifth level by default.
+
+The entertainment branch (anime, manga, games and fandom) lives in
+`config/taxonomy.d/entertainment.toml`: every `*.toml` file in that folder is merged
+into the taxonomy when it loads. Titles of single anime or games are not
+categories; file them with your own labels or `/entity add`.
 
 `literature`, `computing` and `programming` keep their own ids and sit inside
 arts-literature and technology (see "Older ids are kept"); their areas
@@ -433,7 +439,7 @@ you -> ui -> main orchestrator -> agent loop
 
 ```
 main.py            entry point
-config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, taxonomy.toml, taxonomy_auto.toml, system_prompt.txt
+config/            settings, models.toml, mcp_servers.toml, languages.toml, entities.toml, taxonomy.toml, taxonomy.d/ (extra branches), taxonomy_auto.toml, system_prompt.txt
 plugins/           your own tools (one file = one tool)
 scripts/           setup_termux.sh (first install), update.sh (update from GitHub)
 lily/              orchestrator, agent_loop, router, state, bootstrap

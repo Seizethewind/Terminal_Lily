@@ -6,7 +6,7 @@ from lily.memory.taxonomy.service import Taxonomy
 from lily.memory.taxonomy.tree import Tree, load_config
 
 BRANCHES = ("history science math philosophy culture language religion-belief arts-literature social-studies "
-            "political-studies economics medicine technology education research-discovery").split()
+            "political-studies economics medicine technology education research-discovery entertainment").split()
 THINGS = "entity geography nature".split()   # knowledge about things, places and nature
 KEPT = ("science/physics science/chemistry science/biology science/astronomy science/earth math/arithmetic "
         "math/algebra math/geometry math/trigonometry math/calculus math/statistics math/linear-algebra "
@@ -41,7 +41,7 @@ class StudyAreaTests(unittest.TestCase):
         areas = [path for path in self.tree.nodes if path.count("/") == 2 and self.tree.children(path)]
         topics = [path for path in self.tree.nodes if path.count("/") == 3]
         self.assertGreaterEqual(len(areas), 97)
-        self.assertGreaterEqual(len(topics), 700)
+        self.assertGreaterEqual(len(topics), 790)
         for path in topics:
             self.assertIn(path.rsplit("/", 1)[0], self.tree.nodes)
         for path in self.tree.nodes:
@@ -66,7 +66,7 @@ class StudyAreaTests(unittest.TestCase):
 
     def test_some_topics_have_sub_topics_and_nothing_goes_past_the_fifth_level(self):
         deep = [path for path in self.tree.nodes if path.count("/") == 4]
-        self.assertGreaterEqual(len(deep), 200)
+        self.assertGreaterEqual(len(deep), 500)
         for path in deep:
             parent = path.rsplit("/", 1)[0]
             self.assertEqual(parent.count("/"), 3, path)

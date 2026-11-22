@@ -24,6 +24,14 @@ skip = [
     "planet", "moon", "sun", "triangle", "circle", "polygon", "attention", "zen", "mutation", "inheritance",
     "cloning", "entropy", "optimization", "decision-making", "problem-solving", "dynamics", "statics",
     "childhood", "infancy",
+    # entertainment branch: generic words that would file chats wrongly
+    "convention", "quality-assurance", "bug-tracking", "performance-profiling", "engine-architecture",
+    "dialogue-system", "discord-server", "forum-board", "community-moderation", "content-creator",
+    "live-streaming", "queue-system", "resource-management", "controls-scheme", "accessibility-options",
+    "menu-flow", "touch-controls", "battery-performance", "premium-purchase", "league-season",
+    "category-rules", "unlock-system", "power-cost", "technology-level", "story-arc", "pacing-flow",
+    "background-music", "limited-edition", "sound-effects", "motion-tracking", "recording-session",
+    "online-community", "serialization", "publishing-deal", "training-regimen",
 ]
 
 # Extra words for names that are written differently in everyday talk: "word" = "category path".
@@ -34,3 +42,14 @@ gis = "study/geography/gis-remote-sensing"
 dna = "study/science/biology/genetics"
 "black hole" = "study/science/astronomy/stars"
 "global warming" = "study/science/environmental-science/climate-change"
+esports = "study/entertainment/esports-competition"
+esport = "study/entertainment/esports-competition"
+mmo = "study/entertainment/game-genres/rpg/mmorpg"
+tcg = "study/entertainment/tabletop-card-games/trading-card-game"
+gacha = "study/entertainment/more-game-genres/gacha-games"
+fps = "study/entertainment/game-genres/shooter-games/first-person-shooter"
+manhwa = "study/entertainment/novels-webcomics/webtoon-manhwa"
+webtoon = "study/entertainment/novels-webcomics/webtoon-manhwa"
+speedrun = "study/entertainment/esports-competition/speedrunning"
+otaku = "study/entertainment/japanese-pop-culture/otaku-culture"
+vtuber = "study/entertainment/japanese-pop-culture/vtuber-culture"
