@@ -1,6 +1,5 @@
 """The category tree: the top levels from config/taxonomy.toml plus the subcategories you add."""
-import tomllib
-
+from lily.memory.taxonomy import parts
 from lily.memory.taxonomy.paths import clean, is_unknown, parent
 from lily.utils.errors import ConfigError, LilyError
 from lily.utils.paths import CONFIG_DIR
@@ -14,12 +13,7 @@ def _within(path, top):
 
 def load_config(path=PATH):
     """Read the file. Returns (roots, subs, legacy, alias, inside): each a {path: text-or-path} dict."""
-    data = {}
-    if path.is_file():
-        try:
-            data = tomllib.loads(path.read_text(encoding="utf-8"))
-        except tomllib.TOMLDecodeError as err:
-            raise ConfigError(f"{path.name}: {err}") from err
+    data = parts.load(path)
     try:
         roots = {clean(key): str(text) for key, text in data.get("roots", {}).items()}
         subs = {clean(key): str(text) for key, text in data.get("sub", {}).items()}
