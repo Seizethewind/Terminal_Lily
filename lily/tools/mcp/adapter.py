@@ -3,7 +3,7 @@ import re
 
 from lily.tools.base import BaseTool
 from lily.tools.mcp.client import McpClient
-from lily.tools.mcp.config import load_servers
+from lily.tools.mcp.config import load_servers, token_is_safe
 from lily.utils.errors import LilyError
 from lily.utils.logger import get_logger
 
@@ -40,6 +40,8 @@ def load(lily, servers=None, client_factory=McpClient):
         try:
             if server["auth_env"] and not server["token"]:
                 raise LilyError(f"{server['auth_env']} is not set (put it in .env)")
+            if server["token"] and not token_is_safe(server["url"]):
+                raise LilyError("it sends a token, so its url must start with https://")
             client = client_factory(server["url"], server["token"], CONNECT_TIMEOUT)
             client.connect()
             specs = client.list_tools()

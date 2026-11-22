@@ -8,6 +8,7 @@ from lily.utils.errors import ToolError
 
 URL = "https://html.duckduckgo.com/html/"
 AGENT = "Mozilla/5.0 (Android; Mobile) Terminal_Lily/0.1"
+MAX_BYTES = 1_000_000   # a results page is far smaller; this stops a huge reply from filling the phone's memory
 
 
 def _real_url(href):
@@ -63,7 +64,7 @@ def search(query, limit=5, url=URL, timeout=15):
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as resp:
-            html = resp.read().decode("utf-8", "replace")
+            html = resp.read(MAX_BYTES).decode("utf-8", "replace")
     except (urllib.error.URLError, OSError) as err:
         raise ToolError(f"search failed: {err}") from err
     results = parse(html)[:limit]

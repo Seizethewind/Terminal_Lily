@@ -1,11 +1,19 @@
 """Reads config/mcp_servers.toml."""
 import os
 import tomllib
+from urllib.parse import urlparse
 
 from lily.utils.errors import ConfigError
 from lily.utils.paths import CONFIG_DIR
 
 PATH = CONFIG_DIR / "mcp_servers.toml"
+LOCAL = {"localhost", "127.0.0.1", "::1"}
+
+
+def token_is_safe(url):
+    """A bearer token may only go over https, or to this phone itself."""
+    parts = urlparse(url)
+    return parts.scheme == "https" or (parts.scheme == "http" and parts.hostname in LOCAL)
 
 
 def load_servers(path=PATH):
