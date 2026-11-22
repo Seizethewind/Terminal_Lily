@@ -19,6 +19,11 @@ skip = [
     "classification", "navigation", "trend", "sport", "gaming", "fashion", "legend", "portfolio",
     "stars", "war", "rail", "wireless", "modern", "ancient", "contemporary", "commentary", "doctrine",
     "interpretation", "interpreting", "injury", "lecture", "grading", "satellite", "prototype",
+    "family", "company", "tool", "toy", "crowd", "vehicle", "wood", "metal", "flower", "herb", "coast",
+    "forest", "bird", "mammal", "soil", "island", "mountain", "cave", "crop", "vehicle", "device-gadget",
+    "planet", "moon", "sun", "triangle", "circle", "polygon", "attention", "zen", "mutation", "inheritance",
+    "cloning", "entropy", "optimization", "decision-making", "problem-solving", "dynamics", "statics",
+    "childhood", "infancy",
 ]
 
 # Extra words for names that are written differently in everyday talk: "word" = "category path".

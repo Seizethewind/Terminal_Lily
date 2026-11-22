@@ -41,11 +41,11 @@ class StudyAreaTests(unittest.TestCase):
         areas = [path for path in self.tree.nodes if path.count("/") == 2 and self.tree.children(path)]
         topics = [path for path in self.tree.nodes if path.count("/") == 3]
         self.assertGreaterEqual(len(areas), 97)
-        self.assertGreaterEqual(len(topics), 400)
+        self.assertGreaterEqual(len(topics), 700)
         for path in topics:
             self.assertIn(path.rsplit("/", 1)[0], self.tree.nodes)
         for path in self.tree.nodes:
-            if path.count("/") == 2 and path.split("/")[1] in BRANCHES:
+            if path.count("/") == 2 and path.split("/")[1] in BRANCHES + THINGS:
                 self.assertTrue(self.tree.children(path), path)
 
     def test_a_record_filed_on_a_topic_is_found_from_every_level_above(self):
@@ -55,11 +55,24 @@ class StudyAreaTests(unittest.TestCase):
         for path in ("study", "study/science", "study/science/physics", "study/science/physics/optics"):
             self.assertEqual(tax.refs([path]), [("run", "1")], path)
 
-    def test_entity_geography_and_nature_have_study_areas_and_stop_there(self):
+    def test_entity_geography_and_nature_areas_have_topics_and_nothing_goes_deeper(self):
         for branch in THINGS:
             areas = self.tree.children(f"study/{branch}")
             self.assertGreaterEqual(len(areas), 10, branch)
-            self.assertFalse(any(self.tree.children(area) for area in areas), branch)
+            for area in areas:
+                topics = self.tree.children(area)
+                self.assertGreaterEqual(len(topics), 3, area)
+                self.assertFalse(any(self.tree.children(topic) for topic in topics), area)
+
+    def test_some_topics_have_sub_topics_and_nothing_goes_past_the_fifth_level(self):
+        deep = [path for path in self.tree.nodes if path.count("/") == 4]
+        self.assertGreaterEqual(len(deep), 200)
+        for path in deep:
+            parent = path.rsplit("/", 1)[0]
+            self.assertEqual(parent.count("/"), 3, path)
+            self.assertIn(parent, self.tree.nodes)
+            self.assertEqual(self.tree.children(path), [], path)
+        self.assertIn("study/science/physics/optics/laser", self.tree.nodes)
 
 
 if __name__ == "__main__":
