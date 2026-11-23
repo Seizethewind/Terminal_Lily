@@ -5,6 +5,8 @@ from lily.memory.taxonomy.tree import Tree, load_config
 from lily.utils.errors import LilyError
 
 PREVIEW = 60   # characters of a chat shown when listing unclassified runs
+NO_LABEL = ("FROM runs r WHERE NOT EXISTS (SELECT 1 FROM taxonomy_labels t "
+            "WHERE t.kind = 'run' AND t.ref = CAST(r.id AS TEXT))")   # chats with no label, found by SQL
 
 
 class Taxonomy:
@@ -81,12 +83,22 @@ class Taxonomy:
         found = [set(store.refs(self.db, path, kind, self.tree.span(path))) for path in paths]
         return sorted(set.intersection(*found) if mode == "all" else set.union(*found))
 
-    def unclassified(self, kind):
-        """[(ref, preview)] of the records of this kind that have no label yet."""
+    def unclassified(self, kind, limit=None):
+        """[(ref, preview)] of the records of this kind that have no label yet (the first `limit`)."""
         if kind not in self.kinds:
             raise LilyError(f"cannot list '{kind}' records. Kinds that can be listed: {', '.join(self.kinds)}")
+        if kind == "run":   # a big history is filtered by the database, not loaded into memory
+            sql = f"SELECT r.id, substr(replace(r.user_text, char(10), ' '), 1, ?) {NO_LABEL} ORDER BY r.id"
+            rows = self.db.rows(sql + (" LIMIT ?" if limit else ""), (PREVIEW, limit) if limit else (PREVIEW,))
+            return [(str(run), text) for run, text in rows]
         done = store.labelled_refs(self.db, kind)
-        return [(ref, text) for ref, text in self.kinds[kind]() if ref not in done]
+        found = [(ref, text) for ref, text in self.kinds[kind]() if ref not in done]
+        return found[:limit] if limit else found
+
+    def unclassified_count(self, kind):
+        if kind == "run":
+            return self.db.rows(f"SELECT count(*) {NO_LABEL}")[0][0]
+        return len(self.unclassified(kind))
 
     def index_run(self, run_id, user_text="", answer=""):
         """Called after every chat: label it from what the older taxonomies found and the names it uses."""
@@ -99,4 +111,4 @@ class Taxonomy:
         return f"scanned {len(runs)} chat(s), made {total} automatic label(s)"
 
     def report(self):
-        return report.render(self.tree, self.db, {kind: self.unclassified(kind) for kind in self.kinds})
+        return report.render(self.tree, self.db, {kind: self.unclassified_count(kind) for kind in self.kinds})

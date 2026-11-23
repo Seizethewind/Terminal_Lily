@@ -65,6 +65,12 @@ def refs(db, path, kind=None, span=NO_SPAN):
     return db.rows(sql + " ORDER BY kind, ref", params)
 
 
+def run_filter(path, span=NO_SPAN):
+    """SQL and params that keep only the chats (alias `r`) labelled at or below `path`."""
+    where, params = _within(path, span)
+    return f"r.id IN (SELECT CAST(ref AS INTEGER) FROM taxonomy_labels WHERE kind = 'run' AND {where})", params
+
+
 def labelled_refs(db, kind):
     return {ref for (ref,) in db.rows("SELECT DISTINCT ref FROM taxonomy_labels WHERE kind = ?", (kind,))}
 

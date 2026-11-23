@@ -18,8 +18,16 @@ USAGE = """Usage:
 kinds: run (ref = chat number), note (ref = source shown by /notes)"""
 
 
+SHOWN = 50   # lines printed at most; a long list is cut with a count
+
+
+def _more(total, shown, hint=""):
+    return f"\n... and {total - shown} more{hint}" if total > shown else ""
+
+
 def _lines(refs):
-    return "\n".join(f"{kind} {ref}" for kind, ref in refs) or "nothing filed there"
+    text = "\n".join(f"{kind} {ref}" for kind, ref in refs[:SHOWN]) or "nothing filed there"
+    return text + _more(len(refs), SHOWN, ". Narrow it with a deeper path, or search: /search <words> in <path>")
 
 
 @command("taxonomy", "organize stored data: /taxonomy, /taxonomy add|label|show|search ...")
@@ -49,7 +57,9 @@ def _taxonomy(lily, args):
         return _lines(tax.refs(paths, mode=mode))
     if action == "unclassified":
         kind = rest[0] if rest else "run"
-        return "\n".join(f"{ref}  {text}".rstrip() for ref, text in tax.unclassified(kind)) or "nothing is unclassified"
+        rows = tax.unclassified(kind, SHOWN)
+        text = "\n".join(f"{ref}  {text}".rstrip() for ref, text in rows) or "nothing is unclassified"
+        return text + _more(tax.unclassified_count(kind), len(rows))
     if action == "search" and len(rest) >= 2:
         sources = {ref for _, ref in tax.refs([rest[0]], kind="note")}
         hits = layer(lily, "rag").search(" ".join(rest[1:]), 5, sources=sources)
