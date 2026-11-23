@@ -8,7 +8,7 @@ LEVELS = {
     "none": "asks before every tool",
     "basic": "looks around freely; saving and other changes ask (the default)",
     "semi": "basic, and saves or undoes staged files without asking",
-    "full": "semi, and runs ordinary commands in the workplace without asking",
+    "full": "semi, and runs ordinary commands and writes files in the workplace without asking",
 }
 
 
