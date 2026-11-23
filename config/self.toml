@@ -9,7 +9,7 @@ key_env = "LILY_API_KEY"
 
 [local]     # Ollama on this phone: only used when the router fails or there is no internet.
 url = "http://127.0.0.1:11434/v1"
-model = "Lily_Local"   # create it first: ollama cp <a model you pulled> Lily_Local
+model = "lily_ai:0.1"   # Lily_Ai 0.1: create it with scripts/setup_local_ai.sh
 timeout = 180          # a small model can be slow on a phone
 
 [tiers]     # workload tier -> model string sent to the router
