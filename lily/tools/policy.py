@@ -40,9 +40,10 @@ def decide(name, args, staged=False, level="basic"):
     if name == "termux_api":
         return "allow" if args.get("action") in FREE_TERMUX else "ask"
     if name in WRITES:
-        if is_secret(args.get("path", "")):
+        path = args.get("path", "")
+        if is_secret(path) or (level == "full" and shell_risk.outside(path)):
             return "ask"
-        return "allow" if staged else "write"
+        return "allow" if staged or level == "full" else "write"   # full: writes in the workplace go quietly
     return "ask"   # plugins, MCP tools, approve_task and anything new
 
 
