@@ -24,7 +24,7 @@ python main.py
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
 `/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
 `/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
-`/export [all]`, `/stats`, `/code`, `/entity`, `/taxonomy`, `/exit`.
+`/export [all]`, `/stats`, `/code`, `/entity`, `/taxonomy`, `/dict`, `/exit`.
 
 ## Choosing a model
 
@@ -416,6 +416,26 @@ Commands:
 
 New top-level categories are added only in `config/taxonomy.toml`.
 
+## Dictionary
+
+Your own words and what they mean, kept in `data/lily.db` and tied to the taxonomy.
+Each word can carry a category path, so it files chats on its own: a chat that
+mentions "Elden Ring" is filed under `soulslike` even if the word "soulslike" never
+appears. Words in your message also have their meaning added to the prompt (up to 5
+per message, code ignored), so Lily uses your definition of a name, slang or jargon.
+
+- `/dict add <word> = <meaning> [@ <category path>]` saves a word. Saving it again
+  replaces the meaning and keeps its other names.
+- `/dict alias <word> = <other>, <other>` adds other names (`mlbb` for Mobile Legends).
+- `/dict <word>` shows a word, `/dict find <text>` searches names and meanings,
+  `/dict under <path>` lists the words filed under a category, `/dict remove <word>`.
+- `/dict load` adds the starter words in `config/dictionary.toml`. Words you already
+  have are never changed. After adding words with a category, run `/taxonomy scan`
+  to refile older chats.
+
+Pick a path with `/taxonomy find <word>`. Avoid words you also use in everyday talk
+(such as "one piece"): every mention files the chat and adds a meaning to the prompt.
+
 ## Rules of this repo
 
 - Every Python file is **120 lines or fewer** and does **one thing**
@@ -450,6 +470,7 @@ lily/tools/builtin/  shell, read_file, write_file, web_search, termux_api, rag_s
 lily/tools/mcp/    MCP client, adapter and config
 lily/rag/          RAG sub orchestrator, SQLite store, chunker, loader, retriever, ingest
 lily/memory/       data layer: run log, feedback, lessons, history, summarizer, profile hints, export, coding and entity taxonomies
+lily/memory/dictionary.py  your own dictionary (dict_store.py is its table, dict_seed.py loads config/dictionary.toml)
 lily/memory/taxonomy/  universal taxonomy: paths, records, tree (branches, older ids), label store, legacy bridge, automatic filing, browse, report, service
 lily/ui/           terminal loop, rich renderer, slash commands (commands_*.py: one file per command group)
 lily/utils/        logger, errors, paths
