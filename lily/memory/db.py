@@ -31,6 +31,22 @@ CREATE TABLE IF NOT EXISTS dictionary (
     term TEXT PRIMARY KEY, label TEXT, meaning TEXT, path TEXT, aliases TEXT, ts TEXT);
 """
 
+# Full-text index over the chats, kept in step by triggers. Separate so a SQLite without FTS5 still works.
+FTS_SCHEMA = """
+CREATE VIRTUAL TABLE IF NOT EXISTS runs_fts USING fts5(
+    user_text, answer, content='runs', content_rowid='id', tokenize='porter unicode61');
+CREATE TRIGGER IF NOT EXISTS runs_fts_insert AFTER INSERT ON runs BEGIN
+    INSERT INTO runs_fts(rowid, user_text, answer) VALUES (new.id, new.user_text, new.answer);
+END;
+CREATE TRIGGER IF NOT EXISTS runs_fts_delete AFTER DELETE ON runs BEGIN
+    INSERT INTO runs_fts(runs_fts, rowid, user_text, answer) VALUES ('delete', old.id, old.user_text, old.answer);
+END;
+CREATE TRIGGER IF NOT EXISTS runs_fts_update AFTER UPDATE ON runs BEGIN
+    INSERT INTO runs_fts(runs_fts, rowid, user_text, answer) VALUES ('delete', old.id, old.user_text, old.answer);
+    INSERT INTO runs_fts(rowid, user_text, answer) VALUES (new.id, new.user_text, new.answer);
+END;
+"""
+
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -51,6 +67,19 @@ class Database:
                 Path(path).parent.mkdir(parents=True, exist_ok=True)
             self.db = sqlite3.connect(str(path))
             self.db.executescript(SCHEMA)
+            self.fts = self._start_index()
+
+    def _start_index(self):
+        """Create the chat index and add chats saved before it existed. False if SQLite has no FTS5."""
+        try:
+            self.db.executescript(FTS_SCHEMA)
+            saved = self.db.execute("SELECT count(*) FROM runs").fetchone()[0]
+            if saved != self.db.execute("SELECT count(*) FROM runs_fts_docsize").fetchone()[0]:
+                with self.db:
+                    self.db.execute("INSERT INTO runs_fts(runs_fts) VALUES ('rebuild')")
+            return True
+        except sqlite3.OperationalError:
+            return False
 
     def write(self, sql, params=()):
         """Run a change and return the new row id."""

@@ -5,7 +5,7 @@ from lily.memory.taxonomy.paths import UNKNOWN, is_unknown
 SHORT = 60   # characters of a description that are shown
 
 
-def render(tree, db, unclassified):
+def render(tree, db, unclassified):   # unclassified = {kind: how many have no label}
     """The tree with record counts, then unknown, stray paths and unclassified totals."""
     lines, shown = [], set()
     for path, depth in tree.walk():
@@ -22,6 +22,6 @@ def render(tree, db, unclassified):
             lines.append(f"{path}  {labels} label(s)  - not in the tree (was the config edited?)")
     if unknown:
         lines.append(f"{UNKNOWN}  {store.count(db, UNKNOWN)[0]} record(s)  - looked at, does not fit yet")
-    pending = [f"{kind} {len(refs)}" for kind, refs in unclassified.items() if refs]
+    pending = [f"{kind} {count}" for kind, count in unclassified.items() if count]
     lines.append("unclassified  " + (", ".join(pending) if pending else "nothing"))
     return "\n".join(lines)

@@ -4,6 +4,7 @@ from lily.memory.code_taxonomy import CodeTaxonomy
 from lily.memory.db import Database
 from lily.memory.dictionary import Dictionary
 from lily.memory.entity_taxonomy import EntityTaxonomy
+from lily.memory.search import Search
 from lily.memory.taxonomy.service import Taxonomy
 from lily.utils.errors import LilyError
 
@@ -22,6 +23,7 @@ class MemoryOrchestrator:
         self.entities = EntityTaxonomy(lambda: self.db)   # entity / location / object
         self.taxonomy = Taxonomy(lambda: self.db, self._note_sources)   # universal data taxonomy
         self.dictionary = Dictionary(lambda: self.db, self.taxonomy)   # your own words and meanings
+        self.search = Search(lambda: self.db, self.taxonomy, lambda: self.lily.router.get("rag"))   # /search
 
     @property
     def db(self):

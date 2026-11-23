@@ -24,7 +24,7 @@ python main.py
 Commands inside Lily: `/help`, `/clear`, `/profile [auto|fast|smart]`, `/tools`,
 `/reload`, `/ingest <path>`, `/notes`, `/forget <source>`, `/good`, `/bad`,
 `/lesson <text>`, `/lessons`, `/unlearn <n>`, `/history [n]`, `/summarize`,
-`/export [all]`, `/stats`, `/code`, `/entity`, `/taxonomy`, `/dict`, `/exit`.
+`/export [all]`, `/stats`, `/code`, `/entity`, `/taxonomy`, `/dict`, `/search`, `/exit`.
 
 ## Choosing a model
 
@@ -435,6 +435,19 @@ per message, code ignored), so Lily uses your definition of a name, slang or jar
 
 Pick a path with `/taxonomy find <word>`. Avoid words you also use in everyday talk
 (such as "one piece"): every mention files the chat and adds a meaning to the prompt.
+
+## Searching what is stored
+
+`/search <words>` looks through your chats, notes and dictionary at once. Chats are
+indexed (SQLite FTS5, kept up to date automatically, older chats are indexed on first
+start), so it stays fast with a very large history. Chats with all your words come
+first, then chats with any of them. The last word may be half typed.
+
+- `/search elden ring in study/entertainment` limits it to one category (and below).
+- `/search ninja only chats` (or `notes`, `words`) searches one kind.
+- `/search more` shows the next 5 chats. `/search chat <number>` shows a whole chat.
+- `/taxonomy show` and `/taxonomy unclassified` print at most 50 lines and say how
+  many more there are; the unclassified count is computed by the database.
 
 ## Rules of this repo
 
