@@ -3,3 +3,4 @@ data/
 __pycache__/
 *.pyc
 .venv/
+lily_ai_data/
